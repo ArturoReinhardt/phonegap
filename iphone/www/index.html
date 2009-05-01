@@ -9,6 +9,37 @@
     <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
     <script type="text/javascript" charset="utf-8">
 
+      function openPanel(targetPanel) {
+        var container = document.querySelector('body > ul.PanelContainer');
+
+        if (typeof(targetPanel) == 'string')
+          targetPanel = document.querySelector(targetPanel);
+
+        var oldPanelClass = 'front';
+        var newPanelClass = 'back';
+        if (container.className.match(/flipped/)) {
+          oldPanelClass = 'back';
+          newPanelClass = 'front';
+        }
+
+        var currentPanel = document.querySelector('body > ul.PanelContainer > li.' + oldPanelClass);
+
+        // Hide other panels
+        var panels = document.querySelectorAll('body > ul.PanelContainer > li');
+        for (var i = 0; i < panels.length; i++) {
+          var panel = panels[i];
+          if (panel === currentPanel || panel === targetPanel)
+            continue;
+          panel.className = 'hidden';
+        }
+
+        targetPanel.className = newPanelClass;
+        if (container.className.match(/flipped/))
+          container.className = 'PanelContainer';
+        else
+          container.className = 'PanelContainer flipped';
+      }
+
     function deviceInfo(){
       debug.log("deviceInfo");
       document.getElementById("platform").innerHTML = device.model;
@@ -76,16 +107,16 @@
        var toprated = 0;
        uicontrols.createTabBarItem("toprated", "Top Rated", "tabButton:TopRated", {
            onSelect: function() {
-               navigator.notification.alert("Top Rated selected");
                uicontrols.updateTabBarItem("toprated", { badge: ++toprated });
+               openPanel('#Page1');
            }
        });
 
        var recents = 0;
        uicontrols.createTabBarItem("recents", "Recents", "tabButton:Recents", {
            onSelect: function() {
-               navigator.notification.alert("Recents selected");
                uicontrols.updateTabBarItem("recents", { badge: ++recents });
+               openPanel('#Page2');
            }
        });
 
@@ -110,13 +141,12 @@
            }
        });
 
-       try {
        uicontrols.createTabBarItem("search", "Search", "tabButton:Search");
        uicontrols.createTabBarItem("downloads", "Downloads", "tabButton:Downloads");
-       } catch(e) { debug.log(e) }
 
        uicontrols.showTabBar();
        uicontrols.showTabBarItems("toprated", "recents", "history", "more");
+       uicontrols.selectTabBarItem("toprated");
 
        uicontrols.setToolBarTitle("PhoneGap Demo");
     }
@@ -134,7 +164,8 @@
     </script>
   </head>
   <body id="stage" class="theme">
-      <div id="Page1">
+    <ul class="PanelContainer">
+      <li id="Page1" class="front">
         <h2>this file is located at iphone/www/index.html</h2>
         <div id="info" class="Panel">
           <h4>Platform: <span id="platform">&nbsp;</span></h4>
@@ -152,9 +183,10 @@
         <a href="#" class="btn" onclick="customAlert();">Custom Alert</a>
         <a href="#" class="btn" onclick="beep();">Beep</a>
         <a href="#" class="btn" onclick="vibrate();">Vibrate</a>
-      </div>
-      <div id="Page2" style="display: none">
+      </li>
+      <li id="Page2" class="hidden">
         <a href="#" class="btn large" onclick="getContact();">Get Fourth Contact</a>
-      </div>
+      </li>
+    </ul>
   </body>
 </html>
