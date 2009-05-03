@@ -33,6 +33,12 @@
           panel.className = 'hidden';
         }
 
+        container.addEventListener('webkitTransitionEnd', function() {
+            currentPanel.className = 'hidden';
+            container.removeEventListener('webkitTransitionEnd', this, false);
+            delete this;
+        }, false);
+
         targetPanel.className = newPanelClass;
         if (container.className.match(/flipped/))
           container.className = 'PanelContainer';
