@@ -4,16 +4,20 @@ PLATFORMS="iphone blackberry android"
 echo "Building PhoneGap Makefile"
 [ -f Makefile ] && cp Makefile Makefile.old
 
-DOXYGEN=/usr/bin/true
+DOXYGEN=
 if [ -d /Applications/Doxygen.app ]; then
     DOXYGEN=/Applications/Doxygen.app/Contents/Resources/doxygen
 else
     for file in $(locate doxygen | grep -E '/doxygen$'); do
-	if [ -x $file ]; then
+        if [ -x $file ] && [ -f $file ]; then
 	    DOXYGEN=$file
 	    break
 	fi
     done
+    if [ "x$DOXYGEN" = "x" ]; then
+        echo "No Doxygen found; fetch it from http://www.doxygen.org/ and install it in /Applications"
+        DOXYGEN=/usr/bin/true
+    fi
 fi
 
 cat > Makefile <<EOF
@@ -30,10 +34,13 @@ UMASK_NULL = umask 0
 DEV_NULL = > /dev/null 2>&1
 MKPATH = mkdir -p
 CAT = cat
+MAKE = make
+OPEN = open
 ECHO = echo
 ECHO_N = echo -n
 JAVA = java
 DOXYGEN = $DOXYGEN
+IPHONE_DOCSET_TMPDIR = docs/iphone/tmp
 
 all :: $PLATFORMS docs
 
@@ -53,6 +60,17 @@ docs :: javascript_docs iphone_docs
 
 iphone_docs: iphone/doxygen.cfg
 	\$(DOXYGEN) iphone/doxygen.cfg
+	-\$(RM_RF) \$(IPHONE_DOCSET_TMPDIR)
+	\$(MKPATH) \$(IPHONE_DOCSET_TMPDIR)
+
+	\$(CP) iphone/doxygen.cfg \$(IPHONE_DOCSET_TMPDIR)/doxygen.cfg
+	\$(ECHO) "OUTPUT_DIRECTORY = docs/iphone/PhoneGap.docset" >> \$(IPHONE_DOCSET_TMPDIR)/doxygen.cfg
+	\$(ECHO) "GENERATE_DOCSET  = YES" >> \$(IPHONE_DOCSET_TMPDIR)/doxygen.cfg
+	\$(DOXYGEN) \$(IPHONE_DOCSET_TMPDIR)/doxygen.cfg
+
+	\$(MAKE) -C docs/iphone/PhoneGap.docset/html install
+	\$(OPEN) ~/Library/Developer/Shared/Documentation/DocSets/org.phonegap.PhoneGap.docset
+
 EOF
 
 echo javascript_docs :: javascripts/*.js >> Makefile
@@ -66,7 +84,7 @@ lib/$platform/phonegap-min.js: lib/$platform/phonegap.js
 	\$(JAVA) -jar util/yuicompressor-2.4.2.jar --charset UTF-8 -o \$@ lib/$platform/phonegap.js
 
 EOF
-	platform_srcs="javascripts/phonegap.js javascripts/*.js javascripts/$platform/*.js"
+	platform_srcs="javascripts/phonegap.js.base javascripts/*.js javascripts/$platform/*.js"
 	echo lib/$platform/phonegap.js: $platform_srcs >> Makefile
 	echo "	\$(MKPATH) lib/$platform" >> Makefile
 	for file in $( echo $platform_srcs ); do
