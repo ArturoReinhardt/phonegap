@@ -38,6 +38,34 @@
     settings = classSettings;
 }
 
+/**
+ Attempts to find the named file in the application bundle, and returns a file object if it does so.
+ \bNote: This currently doesn't support the use of filenames with more than one dot (".") in them.
+ @param filename the string representing the file within the application bundle
+ */
+-(NSURL*) getLocalFileFor:(NSString*)filename
+{
+    NSBundle       *mainBundle     = [NSBundle mainBundle];
+    NSMutableArray *directoryParts = [NSMutableArray arrayWithArray:[filename componentsSeparatedByString:@"/"]];
+    NSString       *fileComponent  = [directoryParts lastObject];
+    [directoryParts removeLastObject];
+    NSString *directoryStr = [directoryParts componentsJoinedByString:@"/"];
+    
+    NSMutableArray *filenameParts  = [NSMutableArray arrayWithArray:[fileComponent componentsSeparatedByString:@"."]];
+    if ([directoryParts count] <= 1)
+        return nil;
+    
+    NSString *filePath = [mainBundle pathForResource:(NSString*)[filenameParts objectAtIndex:0]
+                                              ofType:(NSString*)[filenameParts objectAtIndex:1]
+                                         inDirectory:directoryStr];
+    NSLog(@"File: %@", filePath);
+    if (filePath == nil) {
+        NSLog(@"Can't find filename %@ in the app bundle", filename);
+        return nil;
+    }
+    return [NSURL fileURLWithPath:filePath];
+}
+
 - (void)dealloc
 {
     if (self.settings)

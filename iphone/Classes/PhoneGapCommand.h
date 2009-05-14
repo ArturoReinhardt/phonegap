@@ -20,5 +20,6 @@
 -(PhoneGapCommand*) initWithWebView:(UIWebView*)theWebView;
 -(void) setWebView:(UIWebView*) theWebView;
 -(void) setSettings:(NSDictionary*) classSettings;
+-(NSURL*) getLocalFileFor:(NSString*)filename;
 
 @end

@@ -13,14 +13,26 @@
 
 #import "PhoneGapCommand.h"
 
-@interface UIControls : PhoneGapCommand <UITabBarDelegate> {
+@interface UIControls : PhoneGapCommand <UITabBarDelegate, UINavigationBarDelegate> {
     UITabBar* tabBar;
     NSMutableDictionary* tabBarItems;
     
+    /*
     UIToolbar* toolBar;
     UIBarButtonItem* toolBarTitle;
     NSMutableDictionary* toolBarItems;
+     */
+    
+    UINavigationBar*  navBar;
+    UIView*           navBarTitle;
+    UINavigationItem* navBarBackButton;
+    UINavigationItem* navBarLeftButton;
+    UINavigationItem* navBarRightButton;
 }
+
+- (void)setFrameFor:(UIView*)control withSettings:(NSDictionary*)controlSettings;
+- (UIBarButtonSystemItem) getBarButtonSystemItemFor:(NSString*)imageName;
+- (UIBarButtonItemStyle)getBarButtonStyleFor:(NSString*)string;
 
 /* Tab Bar methods 
  */
@@ -32,12 +44,20 @@
 - (void)updateTabBarItem:(NSArray*)arguments withDict:(NSDictionary*)options;
 - (void)selectTabBarItem:(NSArray*)arguments withDict:(NSDictionary*)options;
 
+/* NavBar methods
+ */
+- (void)createNavBar:(NSArray*)arguments withDict:(NSDictionary*)options;
+- (void)setNavBar:(NSArray*)arguments withDict:(NSDictionary*)options;
+- (void)navBarRightButtonClicked;
+
 /* Tool Bar methods
  */
+/*
 - (void)createToolBar:(NSArray*)arguments withDict:(NSDictionary*)options;
 - (void)setToolBarTitle:(NSArray*)arguments withDict:(NSDictionary*)options;
 - (void)toolBarTitleClicked;
-
+*/
+ 
 /*
 - (void)createToolBarButton:(NSArray*)arguments withDict:(NSDictionary*)options;
 - (void)createToolBarTitle:(NSArray*)arguments withDict:(NSDictionary*)options;

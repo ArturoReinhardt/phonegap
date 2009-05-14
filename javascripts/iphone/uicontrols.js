@@ -39,10 +39,22 @@ UIControls.prototype.selectTabBarItem = function(tab) {
     PhoneGap.exec("UIControls.selectTabBarItem", tab);
 };
 
-UIControls.prototype.createToolBar = function() {
-    PhoneGap.exec("UIControls.createToolBar");
+UIControls.prototype.createNavBar = function() {
+    PhoneGap.exec("UIControls.createNavBar");
 };
 
-UIControls.prototype.setToolBarTitle = function(title) {
-    PhoneGap.exec("UIControls.setToolBarTitle", title);
+UIControls.prototype.setNavBar = function(title, rightButton, options) {
+    var nav_opts = {};
+    if (typeof(options) != 'object')
+        options = {};
+    if ('animate' in options)
+        nav_opts.animate = options.animate;
+    if ('onShow' in options)
+        nav_opts.onShow = PhoneGap.registerCallback(options.onShow);
+    if ('onHide' in options)
+        nav_opts.onHide = PhoneGap.registerCallback(options.onHide);
+    if ('onButton' in options)
+        nav_opts.onButton = PhoneGap.registerCallback(options.onButton);
+
+    PhoneGap.exec("UIControls.setNavBar", title, rightButton, nav_opts);
 };
