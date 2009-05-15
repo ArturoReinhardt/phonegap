@@ -9,6 +9,7 @@
 @synthesize activityView;
 @synthesize commandObjects;
 @synthesize settings;
+@synthesize jsAppName;
 
 //@synthesize imagePickerController;
 
@@ -45,6 +46,12 @@
  */
 - (void)applicationDidFinishLaunching:(UIApplication *)application
 {	
+    /* Load what our app name is called from the Info.plist bundle.  This is used as the main
+     * class name under which our app is running, since the build-phonegap.sh script renames
+     * the main classes to our application's name at build time.
+     */
+    jsAppName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
+
 	/*
 	 * PhoneGap.plist
 	 *
@@ -308,7 +315,7 @@
         //NSLog(@"Options: %@", options);
         
 		// Tell the JS code that we've gotten this command, and we're ready for another
-        [theWebView stringByEvaluatingJavaScriptFromString:@"PhoneGap.queue.ready = true;"];
+        [theWebView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@.queue.ready = true;", self.jsAppName]];
 		
 		// Check to see if we are provided a class:method style command.
         NSArray* components = [command componentsSeparatedByString:@"."];

@@ -50,6 +50,7 @@
 	Contacts *contacts;
     Console *console;
 	NSURL* appURL;
+    NSString* jsAppName;
     
     NSMutableDictionary *commandObjects;
 }
@@ -60,6 +61,7 @@
 @property (nonatomic, retain) UIActivityIndicatorView *activityView;
 @property (nonatomic, retain) NSMutableDictionary *commandObjects;
 @property (nonatomic, retain) NSDictionary *settings;
+@property (nonatomic, retain) NSString *jsAppName;
 
 //- (void) imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)image2 editingInfo:(NSDictionary *)editingInfo;
 //- (void) imagePickerControllerDidCancel:(UIImagePickerController *)picker;

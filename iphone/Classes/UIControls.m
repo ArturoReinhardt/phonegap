@@ -167,7 +167,6 @@
     }
     
     if (item == nil) {
-        NSLog(@"Creating with custom image and title");
         item = [[UITabBarItem alloc] initWithTitle:title image:[UIImage imageNamed:imageName] tag:tag];
     }
 
