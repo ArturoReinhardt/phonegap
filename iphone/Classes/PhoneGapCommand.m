@@ -39,6 +39,26 @@
 }
 
 /**
+ Fire a callback to the JavaScript objects, using the given callback ID supplied from the JavaScript object at creation time.
+ @param callbackId the unique identifier supplied by the JavaScript code to use as a reference for this callback
+ @param arguments array of arguments to pass into the callback function.
+ @returns dictionary representing the return data of the callback 
+ */
+-(id) fireCallback:(NSInteger)callbackId withArguments:(NSArray*)arguments
+{
+    if (!arguments)
+        arguments = [[[NSArray alloc] init] autorelease];
+
+    NSString *jsCallback = [NSString stringWithFormat:@"PhoneGap.invokeCallback(%d, %@);", callbackId, [arguments JSONFragment]];
+    NSString *retValue = [webView stringByEvaluatingJavaScriptFromString:jsCallback];
+
+    if ([retValue length] > 0)
+        return [retValue JSONValue];
+    else
+        return [[[NSDictionary alloc] init] autorelease];
+}
+
+/**
  Attempts to find the named file in the application bundle, and returns a file object if it does so.
  \bNote: This currently doesn't support the use of filenames with more than one dot (".") in them.
  @param filename the string representing the file within the application bundle

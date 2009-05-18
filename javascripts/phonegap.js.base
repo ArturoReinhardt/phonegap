@@ -88,7 +88,7 @@ PhoneGap.registerCallback = function(cb) {
     // XXX DON'T pop from this array, ever...don't even think about it.  That would shift all the IDs, and fire all the wrong events.
     // This would generally be considered a "Bad Thing" by most people.  So don't do it.  If you want to remove a callback, set its
     // value to null...or use unregisterCallback;
-    return PhoneGap.callbacks.push(cb) - 1;
+    return PhoneGap.callbacks.push(cb);
 };
 
 /**
@@ -96,7 +96,7 @@ PhoneGap.registerCallback = function(cb) {
  * @param {Number} id Unique identifier returned from registerCallback
  */
 PhoneGap.unregisterCallback = function(id) {
-    PhoneGap.callbacks[id] = null;
+    PhoneGap.callbacks[id - 1] = null;
 }
 
 /**
@@ -108,7 +108,8 @@ PhoneGap.unregisterCallback = function(id) {
 PhoneGap.invokeCallback = function(id, args) {
     if (typeof(args) != 'array')
         args = [];
-    if (typeof(PhoneGap.callbacks[id]) != 'function')
+    var idx = id - 1;
+    if (typeof(PhoneGap.callbacks[idx]) != 'function')
         return null;
-    return PhoneGap.callbacks[id](args);
+    return PhoneGap.callbacks[idx](args);
 }

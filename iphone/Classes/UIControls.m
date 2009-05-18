@@ -7,16 +7,17 @@
 //
 
 #import "UIControls.h"
+#import "NSString+HexColor.h"
 
 @implementation UIControls
 @synthesize webView;
 
 -(PhoneGapCommand*) initWithWebView:(UIWebView*)theWebView
 {
-    self = [super initWithWebView:theWebView];
+    self = (UIControls*)[super initWithWebView:theWebView];
     if (self) {
-        tabBarItems = [[NSMutableDictionary alloc] initWithCapacity:5];
-        
+        tabBarItems  = [[NSMutableDictionary alloc] initWithCapacity:5];
+        navBarEvents = [[NSMutableArray alloc] initWithCapacity:5];
     }
     return self;
 }
@@ -38,7 +39,6 @@
     CGRect webViewBounds = webView.bounds;
     CGRect controlBounds;
     if (atBottom) {
-        NSLog(@"atbottom");
         controlBounds = CGRectMake(
                                   webViewBounds.origin.x,
                                   webViewBounds.origin.y + webViewBounds.size.height - height,
@@ -52,7 +52,6 @@
                                    webViewBounds.size.height - height
                                    );
     } else {
-        NSLog(@"attop");
         controlBounds = CGRectMake(
                                   webViewBounds.origin.x,
                                   webViewBounds.origin.y,
@@ -175,7 +174,6 @@
     if (systemItem != -1) {
         item = [[UITabBarItem alloc] initWithTabBarSystemItem:systemItem tag:tag];
     } else {
-        NSLog(@"Creating with custom image and title");
         item = [[UITabBarItem alloc] initWithTitle:title image:[UIImage imageNamed:imageName] tag:tag];
     }
 
@@ -309,9 +307,7 @@
              * RGB or RGBA hex.
              */
             if ([navBarSettings objectForKey:@"tintColor"]) {
-                if ([[navBarSettings objectForKey:@"tintColor"] respondsToSelector:@selector(colorFromHex)]) {
-                    navBar.tintColor = [(NSString*)[navBarSettings objectForKey:@"tintColor"] colorFromHex];
-                }
+                navBar.tintColor = [(NSString*)[navBarSettings objectForKey:@"tintColor"] colorFromHex];
             }
         }
     }
@@ -330,6 +326,9 @@
     BOOL isAnimated = YES;
     if (options != nil && [options objectForKey:@"animated"])
         isAnimated = [[options objectForKey:@"animated"] boolValue];
+    
+    NSMutableDictionary *events = [NSMutableDictionary dictionaryWithDictionary:options];
+    [navBarEvents insertObject:events atIndex:[navBarEvents count]];
 
     UINavigationItem* item = [[[UINavigationItem alloc] initWithTitle:[arguments objectAtIndex:0]] autorelease];
     if ([arguments count] > 1) {
@@ -342,7 +341,6 @@
 
             /* Create a button using a pre-defined system item */
             if (systemItem != -1) {
-                NSLog(@"Set the navbar right button for %@ as a system item", rightTitle);
                 rightButton = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:systemItem
                                                                              target:self
                                                                              action:@selector(navBarRightButtonClicked)
@@ -351,7 +349,6 @@
             
             /* Create a button using an image in the app bundle */
             else if (filePath != nil) {
-                NSLog(@"Set the navbar right button for %@ as an image", rightTitle);
                /*UIImage image = [[[UIImage alloc] initWithContentsOfFile:filePath] autorelease];
                 rightButton = [[[UIBarButtonItem alloc] initWithImage:image
                                                                target:self
@@ -361,7 +358,6 @@
             
             /* Create a plain-text button */
             else {
-                NSLog(@"Set the navbar right button for %@ as plain text", rightTitle);
                 rightButton = [[[UIBarButtonItem alloc] initWithTitle:rightTitle
                                                                 style:itemStyle
                                                                target:self
@@ -369,13 +365,77 @@
                                 ] autorelease];
             }
 
-            rightButton.tag = [options objectForKey:@"rightButtonCallback"];
+            rightButton.tag = [(NSString*)[options objectForKey:@"onButton"] integerValue];
             [item setRightBarButtonItem:rightButton];
         }
     }
     [navBar pushNavigationItem:item animated:isAnimated];
 }
 
+- (void)navigationBar:(UINavigationBar*)theNavBar didPushItem:(UINavigationItem*)item
+{
+    NSInteger callbackId = [[[navBarEvents lastObject] objectForKey:@"onShow"] integerValue];
+    if (callbackId)
+        [self fireCallback:callbackId withArguments:nil];
+}
+
+- (void)navigationBar:(UINavigationBar*)theNavBar didPopItem:(UINavigationItem*)item
+{
+    NSInteger callbackId = [[[navBarEvents lastObject] objectForKey:@"onHide"] integerValue];
+    [navBarEvents removeLastObject];
+    if (callbackId)
+        [self fireCallback:callbackId withArguments:nil];
+}
+
+- (BOOL)navigationBar:(UINavigationBar*)theNavBar shouldPushItem:(UINavigationItem*)item
+{
+    NSInteger callbackId = [[[navBarEvents lastObject] objectForKey:@"onShowStart"] integerValue];
+    if (!callbackId)
+        return YES;
+
+    NSDictionary *result = [self fireCallback:callbackId withArguments:nil];
+    if ([result count] > 0 && ![[result objectForKey:@"allow"] boolValue])
+        return NO;
+    else
+        return YES;
+}
+
+- (BOOL)navigationBar:(UINavigationBar*)theNavBar shouldPopItem:(UINavigationItem*)item
+{
+    NSInteger callbackId = [[[navBarEvents lastObject] objectForKey:@"onHideStart"] integerValue];
+    if (!callbackId)
+        return YES;
+    
+    NSDictionary *result = [self fireCallback:callbackId withArguments:nil];
+    if ([result count] > 0 && ![[result objectForKey:@"allow"] boolValue])
+        return NO;
+    else
+        return YES;
+}
+
+/**
+ Handler that is dispatched when a right navbar button is clicked.  This will call the appropriate callback
+ in the JavaScript environment if one has been established.
+ */
+- (void)navBarRightButtonClicked
+{
+    UINavigationItem *topItem = navBar.topItem;
+    NSInteger callbackId = topItem.rightBarButtonItem.tag;
+    if (!callbackId || callbackId < 1)
+        return;
+    [self fireCallback:callbackId withArguments:nil]; 
+}
+
+#pragma mark -
+#pragma mark Utility Functions
+
+/**
+ Utility function used to translate a string into an internal constant representing a button bar type.
+ Valid values are:
+ - \c bordered (default)
+ - \c plain
+ - \c done
+ */
 - (UIBarButtonItemStyle)getBarButtonStyleFor:(NSString*)string
 {
     if (string) {
@@ -389,6 +449,10 @@
     return UIBarButtonItemStyleBordered;
 }
 
+/**
+ Utility function used to translate a string into an internal constant representing a system item icon type.
+ These are typically used by tab bars or navigation bars to render a native icon type, such as "Search", "History", etc.
+ */
 - (UIBarButtonSystemItem) getBarButtonSystemItemFor:(NSString*)imageName
 {
     if ([imageName isEqualToString:@"tabButton:More"])           return UITabBarSystemItemMore;
@@ -408,8 +472,10 @@
     if ([imageName isEqualToString:@"toolButton:Edit"])          return UIBarButtonSystemItemEdit;
     if ([imageName isEqualToString:@"toolButton:Save"])          return UIBarButtonSystemItemSave;
     if ([imageName isEqualToString:@"toolButton:Add"])           return UIBarButtonSystemItemAdd;
-    if ([imageName isEqualToString:@"toolButton:FlexibleSpace"]) return UIBarButtonSystemItemFlexibleSpace;
-    if ([imageName isEqualToString:@"toolButton:FixedSpace"])    return UIBarButtonSystemItemFixedSpace;
+    // XXX Not applicable, since these are used when composing custom toolbars by hand; this is
+    //     too difficult for me to worry about at the moment.
+    //if ([imageName isEqualToString:@"toolButton:FlexibleSpace"]) return UIBarButtonSystemItemFlexibleSpace;
+    //if ([imageName isEqualToString:@"toolButton:FixedSpace"])    return UIBarButtonSystemItemFixedSpace;
     if ([imageName isEqualToString:@"toolButton:Compose"])       return UIBarButtonSystemItemCompose;
     if ([imageName isEqualToString:@"toolButton:Reply"])         return UIBarButtonSystemItemReply;
     if ([imageName isEqualToString:@"toolButton:Action"])        return UIBarButtonSystemItemAction;
@@ -426,120 +492,12 @@
     if ([imageName isEqualToString:@"toolButton:FastForward"])   return UIBarButtonSystemItemFastForward;
     return -1;
 }
-            
-            
-- (void)navBarRightButtonClicked
-{
-}
-
-/*********************************************************************************/
-/*
-- (void)createToolBar:(NSArray*)arguments withDict:(NSDictionary*)options
-{
-    CGFloat height   = 39.0f;
-    BOOL atTop       = YES;
-    UIBarStyle style = UIBarStyleDefault;
-
-    NSDictionary* toolBarSettings = [settings objectForKey:@"ToolBarSettings"];
-    if (toolBarSettings) {
-        if ([toolBarSettings objectForKey:@"height"])
-            height = [[toolBarSettings objectForKey:@"height"] floatValue];
-        if ([toolBarSettings objectForKey:@"position"])
-            atTop  = [[toolBarSettings objectForKey:@"position"] isEqualToString:@"top"];
-        
-        NSString *styleStr = [toolBarSettings objectForKey:@"style"];
-        if ([styleStr isEqualToString:@"Default"])
-            style = UIBarStyleDefault;
-        else if ([styleStr isEqualToString:@"BlackOpaque"])
-            style = UIBarStyleBlackOpaque;
-        else if ([styleStr isEqualToString:@"BlackTranslucent"])
-            style = UIBarStyleBlackTranslucent;
-    }
-
-    CGRect webViewBounds = webView.bounds;
-    CGRect toolBarBounds = CGRectMake(
-                              webViewBounds.origin.x,
-                              webViewBounds.origin.y,
-                              webViewBounds.size.width,
-                              height
-                              );
-    webViewBounds = CGRectMake(
-                               webViewBounds.origin.x,
-                               webViewBounds.origin.y + height,
-                               webViewBounds.size.width,
-                               webViewBounds.size.height - height
-                               );
-    toolBar = [[UIToolbar alloc] initWithFrame:toolBarBounds];
-    [toolBar sizeToFit];
-    toolBar.hidden                 = NO;
-    toolBar.multipleTouchEnabled   = NO;
-    toolBar.autoresizesSubviews    = YES;
-    toolBar.userInteractionEnabled = YES;
-    toolBar.barStyle               = style;
-
-    [toolBar setFrame:toolBarBounds];
-    [webView setFrame:webViewBounds];
-
-    [self.webView.superview addSubview:toolBar];
-}
-*/
-
-/*
-- (void)createToolBarButton:(NSArray*)arguments withDict:(NSDictionary*)options
-{
-}
- */
-/*
-- (void)createToolBarItem:(NSArray*)arguments withDict:(NSDictionary*)options
-{
-    if (!toolBar)
-        [self createToolBar:nil options:nil];
-    
-    NSString  *name  = [arguments objectAtIndex:0];
-    NSString  *title = [arguments objectAtIndex:1];
-    NSString  *style = [arguments objectAtIndex:2];
-    UIBarButtonItemStyle styleRef = UIBarButtonItemStylePlain;
-    if ([style isEqualTo:@"plain"])
-        styleRef = UIBarButtonItemStylePlain;
-    else if ([style isEqualTo:@"border"])
-        styleRef = UIBarButtonItemStyleBordered;
-    else if ([style isEqualTo:
-        
-
-    UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithTitle:title style:styleRef target:self action:@selector(clickedToolBarTitle)];
-    [toolBarItems setObject:item forKey:name];
-}
-*/
- 
-/*
-- (void)setToolBarTitle:(NSArray*)arguments withDict:(NSDictionary*)options
-{
-    if (!toolBar)
-        [self createToolBar:nil withDict:nil];
-
-    NSString *title = [arguments objectAtIndex:0];
-    if (!toolBarTitle) {
-        toolBarTitle = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStylePlain target:self action:@selector(toolBarTitleClicked)];
-    } else {
-        toolBarTitle.title = title;
-    }
-
-    UIBarButtonItem *space1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
-    UIBarButtonItem *space2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
-    NSArray *items = [[NSArray alloc] initWithObjects:space1, toolBarTitle, space2, nil];
-    [toolBar setItems:items];
-}
-
-- (void)toolBarTitleClicked
-{
-    NSLog(@"Toolbar clicked");
-}
-*/
 
 - (void)dealloc
 {
     if (tabBar)
         [tabBar release];
+    [navBarEvents release];
     [super dealloc];
 }
 

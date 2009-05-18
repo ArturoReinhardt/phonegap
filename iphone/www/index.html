@@ -130,8 +130,20 @@
       setupToolbars();
       uicontrols.setNavBar('My Title', 'Go Right', {
         onButton: function() {
-          //uicontrols.setNavBar('Another title', 'toolButton:Camera');
-          uicontrols.setNavBar('Another title');
+          uicontrols.setNavBar('Another title', 'toolButton:Trash', {
+            onShowStart: function() {
+              debug.log("New navbar item starting to show");
+            },
+            onShow: function() {
+              debug.log("New navbar item shown");
+            },
+            onHideStart: function() {
+              debug.log("New navbar item starting to go away");
+            },
+            onHide: function() {
+              debug.log("New navbar item has gone away");
+            }
+          });
         }
       });
 

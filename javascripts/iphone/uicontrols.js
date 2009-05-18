@@ -49,12 +49,12 @@ UIControls.prototype.setNavBar = function(title, rightButton, options) {
         options = {};
     if ('animate' in options)
         nav_opts.animate = options.animate;
-    if ('onShow' in options)
-        nav_opts.onShow = PhoneGap.registerCallback(options.onShow);
-    if ('onHide' in options)
-        nav_opts.onHide = PhoneGap.registerCallback(options.onHide);
-    if ('onButton' in options)
-        nav_opts.onButton = PhoneGap.registerCallback(options.onButton);
+    var function_callbacks = ['onButton', 'onShow', 'onShowStart', 'onHide', 'onHideStart'];
+    for (var i = 0; i < function_callbacks.length; i++) {
+        var eventName = function_callbacks[i];
+        if (eventName in options)
+            nav_opts[eventName] = PhoneGap.registerCallback(options[eventName]);
+    }
 
     PhoneGap.exec("UIControls.setNavBar", title, rightButton, nav_opts);
 };

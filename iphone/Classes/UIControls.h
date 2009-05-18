@@ -28,6 +28,7 @@
     UINavigationItem* navBarBackButton;
     UINavigationItem* navBarLeftButton;
     UINavigationItem* navBarRightButton;
+    NSMutableArray*   navBarEvents;
 }
 
 - (void)setFrameFor:(UIView*)control withSettings:(NSDictionary*)controlSettings;
@@ -50,20 +51,11 @@
 - (void)setNavBar:(NSArray*)arguments withDict:(NSDictionary*)options;
 - (void)navBarRightButtonClicked;
 
-/* Tool Bar methods
- */
 /*
-- (void)createToolBar:(NSArray*)arguments withDict:(NSDictionary*)options;
-- (void)setToolBarTitle:(NSArray*)arguments withDict:(NSDictionary*)options;
-- (void)toolBarTitleClicked;
+- (void) navigationBar:(UINavigationBar*)theNavBar didPushItem:(UINavigationItem*)item;
+- (void) navigationBar:(UINavigationBar*)theNavBar didPopItem:(UINavigationItem*)item;
+- (BOOL) navigationBar:(UINavigationBar*)theNavBar shouldPushItem:(UINavigationItem*)item;
+- (BOOL) navigationBar:(UINavigationBar*)theNavBar shouldPopItem:(UINavigationItem*)item;
 */
- 
-/*
-- (void)createToolBarButton:(NSArray*)arguments withDict:(NSDictionary*)options;
-- (void)createToolBarTitle:(NSArray*)arguments withDict:(NSDictionary*)options;
-*/
-
-//- (void)setToolBarTitle:(NSArray*)arguments withDict:(NSDictionary*)options;
-//- (void)setToolBarButtons:(NSArray*)arguments withDict:(NSDictionary*)options;
 
 @end

@@ -100,9 +100,11 @@ UIControls.prototype.createNavBar = function() {};
  * @param {String} rightButton the label to use on the right button; if null, no button is shown
  * @param {Object} options one or more options
  *  - \c animate causes the new navbar to animate into view; (default: \c true)
+ *  - \c onButton function callback that fires when the optional button is pressed
  *  - \c onShow function callback that fires when this navbar is in view
  *  - \c onHide function callback that fires when this navbar is no longer shown, either when a new navbar is added, or when a previous navbar is re-selected
- *  - \c onButton function callback that fires when the optional button is pressed
+ *  - \c onStartShow function callback that fires when this navbar starts to be shown
+ *  - \c onStartHide function callback that fires when this navbar starts to hide
  */
 UIControls.prototype.setToolBarTitle = function(title, rightButton, options) {};
 

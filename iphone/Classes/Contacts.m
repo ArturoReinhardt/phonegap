@@ -18,7 +18,7 @@
 
 -(PhoneGapCommand*) initWithWebView:(UIWebView*)theWebView
 {
-    self = [super initWithWebView:(UIWebView*)theWebView];
+    self = (Contacts*)[super initWithWebView:(UIWebView*)theWebView];
     if (self) {
         addressBook = ABAddressBookCreate();
     }
