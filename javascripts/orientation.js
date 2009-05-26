@@ -16,13 +16,15 @@ function Orientation() {
  * the document element.  The event has the property \c orientation which can be used to retrieve
  * the device's current orientation, in addition to the \c Orientation.currentOrientation class property.
  *
- * @param {Number} orientation The orientation to be set
+ * @param {Number} orientation The orientation to be set, in degrees
+ * @param {Number} duration The duration the animation will take, in miliseconds
  */
-Orientation.prototype.setOrientation = function(orientation) {
+Orientation.prototype.setOrientation = function(orientation, duration) {
     Orientation.currentOrientation = orientation;
     var e = document.createEvent('Events');
-    e.initEvent('orientationChanged', 'false', 'false');
+    e.initEvent('startOrientationChange', 'false', 'false');
     e.orientation = orientation;
+    e.duration = duration;
     document.dispatchEvent(e);
 };
 

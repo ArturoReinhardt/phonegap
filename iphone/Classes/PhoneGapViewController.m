@@ -11,6 +11,10 @@
 
 @implementation PhoneGapViewController
 
+/**
+ Used by UIKit to determine if the device's interface should rotate to the device's physical orientation.
+ This can be controlled by setting the \c RotateOrientation property in PhoneGap.plist
+ */
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation) interfaceOrientation 
 {
     if (autoRotate == YES) {
@@ -29,13 +33,39 @@
 }
 
 /**
- Called by UIKit when the device starts to rotate to a new orientation.  This fires the \c setOrientation
- method on the Orientation object in JavaScript.  Look at the JavaScript documentation for more information.
+ Called when the device starts to rotate to a new orientation.  This fires the \c setOrientation
+ method on the Orientation object in JavaScript, which in turn dispatches the \c startOrientationChange event on the document element.
+ Look at the JavaScript documentation for more information.
  */
-- (void)willRotateToInterfaceOrientation: (UIInterfaceOrientation)toInterfaceOrientation duration: (NSTimeInterval)duration {
+- (void)willRotateToInterfaceOrientation: (UIInterfaceOrientation)toInterfaceOrientation duration: (NSTimeInterval)duration
+{
+	[webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"navigator.orientation.setOrientation(%f, %d);",
+                                                     [self getRotationInDegrees:toInterfaceOrientation],
+                                                     duration * 1000
+     ]];
+}
+
+/**
+ Called when the device orientation animation finishes; calls the \c stopOrientationChange event on the document element directly
+ */
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    NSString *jsCallback = [NSString stringWithFormat:@"(function(){ var e = document.createEvent('Events'); e.initEvent('stopOrientationChange', 'false', 'false'); e.orientation = %f; document.dispatchEvent(e); })()",
+                                [self getRotationInDegrees:fromInterfaceOrientation]
+                            ];
+	[webView stringByEvaluatingJavaScriptFromString:jsCallback];
+}
+
+/**
+ Internal method used in the view controller to convert UI orientation constants into
+ degrees
+ @param forOrientation the constant to return an orientation for
+ */
+- (double)getRotationInDegrees: (UIInterfaceOrientation)forOrientation
+{
 	double i = 0;
 	
-	switch (toInterfaceOrientation){
+	switch (forOrientation){
 		case UIInterfaceOrientationPortrait:
 			i = 0;
 			break;
@@ -49,7 +79,7 @@
 			i = -90;
 			break;
 	}
-	[webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"navigator.orientation.setOrientation(%f);", i]];
+    return i;
 }
 
 - (void) setAutoRotate:(BOOL) shouldRotate {
