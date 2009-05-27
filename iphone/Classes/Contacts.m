@@ -13,7 +13,7 @@
 #import <UIKit/UIApplication.h>
 #import "Contacts.h"
 #import "PhoneGapDelegate.h"
-#include "Categories.h"
+//#include "Categories.h"
 
 @implementation Contacts
 
