@@ -14,7 +14,7 @@
 
 -(PhoneGapCommand*) initWithWebView:(UIWebView*)theWebView
 {
-    self = [super initWithWebView:(UIWebView*)theWebView];
+    self = (Location*)[super initWithWebView:(UIWebView*)theWebView];
     if (self) {
         self.locationManager = [[[CLLocationManager alloc] init] autorelease];
         self.locationManager.delegate = self; // Tells the location manager to send updates to this object

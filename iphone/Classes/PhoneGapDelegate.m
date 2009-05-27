@@ -61,7 +61,7 @@
     NSString *startOrientation     = [settings objectForKey:@"StartOrientation"];
     NSString *rotateOrientation    = [settings objectForKey:@"RotateOrientation"];
     NSString *topActivityIndicator = [settings objectForKey:@"TopActivityIndicator"];
-    
+	
 	/*
 	 * Fire up the GPS Service right away as it takes a moment for data to come back.
 	 */
@@ -307,7 +307,7 @@
      */
     else if ([url isFileURL])
     {
-        NSLog(@"File URL %@", [url description]);
+        //NSLog(@"File URL %@", [url description]);
         return YES;
     }
     
@@ -316,7 +316,7 @@
      */
     else
     {
-        NSLog(@"Unknown URL %@", [url description]);
+        //NSLog(@"Unknown URL %@", [url description]);
         [[UIApplication sharedApplication] openURL:url];
         return NO;
 	}

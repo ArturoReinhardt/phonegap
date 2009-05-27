@@ -18,8 +18,6 @@
 
 -(PhoneGapCommand*) initWithWebView:(UIWebView*)theWebView settings:(NSDictionary*)classSettings;
 -(PhoneGapCommand*) initWithWebView:(UIWebView*)theWebView;
--(void) setWebView:(UIWebView*) theWebView;
--(void) setSettings:(NSDictionary*) classSettings;
 
 -(id) fireCallback:(NSInteger)callbackId withArguments:(NSArray*)arguments;
 
