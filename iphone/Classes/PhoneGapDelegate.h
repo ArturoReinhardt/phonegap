@@ -38,6 +38,7 @@
     UIInterfaceOrientation orientationType;
     NSDictionary *settings;
     NSMutableDictionary *commandObjects;
+    NSString *jsAppName;
 }
 
 @property (nonatomic, retain) UIWindow *window;
