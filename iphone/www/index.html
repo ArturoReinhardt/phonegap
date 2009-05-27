@@ -30,7 +30,7 @@
     }
     
     function customAlert(){
-      navigator.notification.alert("Custom alert", "Custom title", "Yup!");
+      navigator.notification.alert("Custom alert", "Custom title", "Yup!", "Nope", { onClose: function(index, label) { debug.log("alert's onClick callback called on button " + index + " (" + label + ")") } });
     }
   
     function beep(){
@@ -206,11 +206,13 @@
       deviceInfo();
       document.addEventListener('startOrientationChange', function(e) { debug.log("Orientation changing to " + e.orientation); }, false);
       document.addEventListener('stopOrientationChange', function(e) { debug.log("Orientation changed from " + e.orientation); }, false);
+      document.addEventListener('alertClosed', function(e) { debug.log("Alert box closed when user clicked button " + e.buttonIndex + " having title " + e.buttonLabel); }, false);
     });
     
     </script>
   </head>
   <body id="stage" class="theme">
+      <!--
 	  <a href="javascript:addContact(true)">New Contact (GUI)</a>
 	  <br />
 	  <a href="javascript:addContact(false)">New Contact (API)</a>
@@ -229,6 +231,7 @@
 	  <br />
 	  <a href="javascript:contactsCount()">Contacts Count</a>
 	  <br />
+      -->
       <div id="Page1">
         <h2>this file is located at iphone/www/index.html</h2>
         <div id="info" class="Panel">

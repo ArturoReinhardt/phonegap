@@ -78,7 +78,6 @@
     NSString *filePath = [mainBundle pathForResource:(NSString*)[filenameParts objectAtIndex:0]
                                               ofType:(NSString*)[filenameParts objectAtIndex:1]
                                          inDirectory:directoryStr];
-    NSLog(@"File: %@", filePath);
     if (filePath == nil) {
         NSLog(@"Can't find filename %@ in the app bundle", filename);
         return nil;

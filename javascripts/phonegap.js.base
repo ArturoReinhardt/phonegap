@@ -106,10 +106,8 @@ PhoneGap.unregisterCallback = function(id) {
  * @returns {Object} returns whatever the callback returns, or \c null if the function has been removed.
  */
 PhoneGap.invokeCallback = function(id, args) {
-    if (typeof(args) != 'array')
-        args = [];
     var idx = id - 1;
     if (typeof(PhoneGap.callbacks[idx]) != 'function')
         return null;
-    return PhoneGap.callbacks[idx](args);
+    return PhoneGap.callbacks[idx].apply(null, args);
 }

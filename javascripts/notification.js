@@ -9,9 +9,13 @@ function Notification() {
  * Open a native alert dialog, with a customizable title and button text.
  * @param {String} message Message to print in the body of the alert
  * @param {String} [title="Alert"] Title of the alert dialog (default: Alert)
- * @param {String} [buttonLabel="OK"] Label of the close button (default: OK)
+ * @param {String} [okLabel="OK"] Label of the first button (default: OK)
+ * @param {String} [cancelLabel] Label of the optional second button
+ * @param {Object} [options] Options to pass to the alert:
+ *      - \c onClose {Function} callback handler to be called when the alert is closed; called with an Event
+ *        object, with the \c buttonIndex and \c buttonLabel properties indicating which button was clicked.
  */
-Notification.prototype.alert = function(message, title, buttonLabel) {
+Notification.prototype.alert = function(message, title, buttonLabel, cancelLabel, options) {
     // Default is to use a browser alert; this will use "index.html" as the title though
     alert(message);
 };
