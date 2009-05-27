@@ -61,7 +61,7 @@
     NSString *startOrientation     = [settings objectForKey:@"StartOrientation"];
     NSString *rotateOrientation    = [settings objectForKey:@"RotateOrientation"];
     NSString *topActivityIndicator = [settings objectForKey:@"TopActivityIndicator"];
-    
+	
 	/*
 	 * Fire up the GPS Service right away as it takes a moment for data to come back.
 	 */

@@ -13,10 +13,9 @@
 
 -(PhoneGapCommand*) initWithWebView:(UIWebView*)theWebView
 {
-    self = [super initWithWebView:theWebView];
+    self = (UIControls*)[super initWithWebView:theWebView];
     if (self) {
         tabBarItems = [[NSMutableDictionary alloc] initWithCapacity:5];
-        
     }
     return self;
 }

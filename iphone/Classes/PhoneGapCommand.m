@@ -28,16 +28,6 @@
     return self;
 }
 
--(void) setWebView:(UIWebView*) theWebView
-{
-    webView = theWebView;
-}
-
--(void) setSettings:(NSDictionary*) classSettings
-{
-    settings = classSettings;
-}
-
 - (void)dealloc
 {
     if (self.settings)
