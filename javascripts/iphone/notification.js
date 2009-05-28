@@ -16,7 +16,6 @@ Notification.prototype.alert = function(message, title, okLabel, cancelLabel, op
     if (typeof(options) == 'object' && "onClose" in options)
         args.onClose = PhoneGap.registerCallback(options.onClose);
 
-    debug.log(args);
     if (PhoneGap.available)
         PhoneGap.exec('Notification.alert', message, args);
     else

@@ -82,6 +82,11 @@
  */
 - (void)createTabBar:(NSArray*)arguments withDict:(NSDictionary*)options
 {
+    if (tabBar) {
+        NSLog(@"Tab bar already exists; not creating another.");
+        return;
+    }
+
     tabBar = [UITabBar new];
     [tabBar sizeToFit];
     tabBar.delegate = self;
@@ -271,44 +276,47 @@
  */
 - (void)createNavBar:(NSArray*)arguments withDict:(NSDictionary*)options
 {
-    if (!navBar) {
-        NSDictionary* navBarSettings = [settings objectForKey:@"NavBar"];
+    if (navBar) {
+        NSLog(@"Navigation bar already exists; not creating another.");
+        return;
+    }
+    
+    NSDictionary* navBarSettings = [settings objectForKey:@"NavBar"];
 
-        navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 320.0f, 38.0f)];
-        navBar.delegate = self;
-        navBar.multipleTouchEnabled   = NO;
-        navBar.autoresizesSubviews    = YES;
-        navBar.userInteractionEnabled = YES;
-        navBar.hidden = NO;
-        [self setFrameFor:navBar withSettings:navBarSettings];
-        [self.webView.superview addSubview:navBar];
-        [self.webView.superview bringSubviewToFront:navBar];
+    navBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 320.0f, 38.0f)];
+    navBar.delegate = self;
+    navBar.multipleTouchEnabled   = NO;
+    navBar.autoresizesSubviews    = YES;
+    navBar.userInteractionEnabled = YES;
+    navBar.hidden = NO;
+    [self setFrameFor:navBar withSettings:navBarSettings];
+    [self.webView.superview addSubview:navBar];
+    [self.webView.superview bringSubviewToFront:navBar];
+
+    /**
+     * Properties:
+     *   opaque: If not specified, then the default is used; otherwise, it will be opaque or
+     *           translucent if supplied, depending on the checked value.
+     */
+    if (navBarSettings) {
+        /**
+         * The opaque setting controls whether or not the background of the navbar will
+         * be fully opaque, or translucent.
+         */
+        if ([navBarSettings objectForKey:@"opaque"]) {
+            if ([[navBarSettings objectForKey:@"opaque"] boolValue])
+                navBar.barStyle = UIBarStyleBlackOpaque;
+            else
+                navBar.barStyle = UIBarStyleBlackTranslucent;
+        }
 
         /**
-         * Properties:
-         *   opaque: If not specified, then the default is used; otherwise, it will be opaque or
-         *           translucent if supplied, depending on the checked value.
+         * The tintColor property influences what the color of the navbar background will be,
+         * which is also dependant on the opaque property.  Supply a color value in standard
+         * RGB or RGBA hex.
          */
-        if (navBarSettings) {
-            /**
-             * The opaque setting controls whether or not the background of the navbar will
-             * be fully opaque, or translucent.
-             */
-            if ([navBarSettings objectForKey:@"opaque"]) {
-                if ([[navBarSettings objectForKey:@"opaque"] boolValue])
-                    navBar.barStyle = UIBarStyleBlackOpaque;
-                else
-                    navBar.barStyle = UIBarStyleBlackTranslucent;
-            }
-
-            /**
-             * The tintColor property influences what the color of the navbar background will be,
-             * which is also dependant on the opaque property.  Supply a color value in standard
-             * RGB or RGBA hex.
-             */
-            if ([navBarSettings objectForKey:@"tintColor"]) {
-                navBar.tintColor = [(NSString*)[navBarSettings objectForKey:@"tintColor"] colorFromHex];
-            }
+        if ([navBarSettings objectForKey:@"tintColor"]) {
+            navBar.tintColor = [(NSString*)[navBarSettings objectForKey:@"tintColor"] colorFromHex];
         }
     }
 }

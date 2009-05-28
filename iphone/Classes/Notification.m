@@ -80,17 +80,12 @@
 
 - (void)activityStart:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options
 {
-    //[(UIActivityIndicatorView*)[self.webView.window viewWithTag:2] startAnimating];
-    NSLog(@"Starting");
     UIApplication* app = [UIApplication sharedApplication];
     app.networkActivityIndicatorVisible = YES;
 }
 
 - (void)activityStop:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options
 {
-    //[(UIActivityIndicatorView*)[self.webView.window viewWithTag:2] stopAnimating];
-
-    NSLog(@"Stopping ");
     UIApplication* app = [UIApplication sharedApplication];
     app.networkActivityIndicatorVisible = NO;
 }
