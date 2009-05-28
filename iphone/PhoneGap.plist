@@ -16,31 +16,23 @@
 	<string>portrait</string>
 	<key>RotateOrientation</key>
 	<string>portrait</string>
-	<key>UIControls</key>
-	<dict>
-		<key>TabBar</key>
-		<dict>
-			<key>height</key>
-			<integer>49</integer>
-			<key>position</key>
-			<string>bottom</string>
-		</dict>
-		<key>ToolBar</key>
-		<dict>
-			<key>style</key>
-			<string>Default</string>
-		</dict>
-		<key>NavBar</key>
-		<dict>
-			<key>height</key>
-			<integer>44</integer>
-			<key>position</key>
-			<string>top</string>
-			<key>opaque</key>
-			<true/>
-			<key>tintColor</key>
-			<string>#003399</string>
-		</dict>
-	</dict>
+        <key>TabBar</key>
+        <dict>
+                <key>height</key>
+                <integer>49</integer>
+                <key>position</key>
+                <string>bottom</string>
+        </dict>
+        <key>NavigationBar</key>
+        <dict>
+                <key>height</key>
+                <integer>44</integer>
+                <key>position</key>
+                <string>top</string>
+                <key>opaque</key>
+                <true/>
+                <key>tintColor</key>
+                <string>#003399</string>
+        </dict>
 </dict>
 </plist>

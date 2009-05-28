@@ -22,6 +22,8 @@
 
 -(id) fireCallback:(NSInteger)callbackId withArguments:(NSArray*)arguments;
 
--(NSURL*) getLocalFileFor:(NSString*)filename;
+- (void)setFrameFor:(UIView*)control withSettings:(NSDictionary*)controlSettings;
+- (NSURL*)getLocalFileFor:(NSString*)filename;
+- (UIBarButtonSystemItem)getBarButtonSystemItemFor:(NSString*)imageName;
 
 @end

@@ -8,7 +8,6 @@
 #import "Sound.h"
 #import "Contacts.h"
 #import "DebugConsole.h"
-#import "UIControls.h"
 //#import "Image.h"
 
 @class PhoneGapViewController;

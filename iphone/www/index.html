@@ -131,50 +131,37 @@
     }
     
     function setupToolbars() {
-       uicontrols.createTabBar();
+       tabbar.createTabBar();
 
        var toprated = 0;
-       uicontrols.createTabBarItem("toprated", "Top Rated", "tabButton:TopRated", {
+       tabbar.createTabBarItem("toprated", "Top Rated", "tabButton:TopRated", {
            onSelect: function() {
                navigator.notification.alert("Top Rated selected");
-               uicontrols.updateTabBarItem("toprated", { badge: ++toprated });
+               tabbar.updateTabBarItem("toprated", { badge: ++toprated });
            }
        });
 
        var recents = 0;
-       uicontrols.createTabBarItem("recents", "Recents", null, {
+       tabbar.createTabBarItem("recents", "Recents", null, {
            onSelect: function() {
                navigator.notification.alert("Recents selected");
-               uicontrols.updateTabBarItem("recents", { badge: ++recents });
+               tabbar.updateTabBarItem("recents", { badge: ++recents });
            }
        });
 
        var history = 0;
-       uicontrols.createTabBarItem("history", "History", "icon.png", {
+       tabbar.createTabBarItem("history", "History", "icon.png", {
            onSelect: function() {
                navigator.notification.alert("History selected");
-               uicontrols.updateTabBarItem("history", { badge: ++history });
+               tabbar.updateTabBarItem("history", { badge: ++history });
            }
        });
 
-       var more = false;
-       uicontrols.createTabBarItem("more", "More", "tabButton:More", {
-           onSelect: function() {
-               if (more) {
-                   uicontrols.showTabBarItems("search", "downloads", "more");
-               } else {
-                   uicontrols.showTabBarItems("toprated", "recents", "history", "more");
-               }
-               uicontrols.selectTabBarItem(null);
-               more = !more;
-           }
-       });
+       tabbar.createTabBarItem("search", "Search", "tabButton:Search");
+       tabbar.createTabBarItem("downloads", "Downloads", "tabButton:Downloads");
 
-       uicontrols.createTabBarItem("search", "Search", "tabButton:Search");
-       uicontrols.createTabBarItem("downloads", "Downloads", "tabButton:Downloads");
-
-       uicontrols.showTabBar();
-       uicontrols.showTabBarItems("toprated", "recents", "history", "more");
+       tabbar.showTabBar();
+       tabbar.showTabBarItems("toprated", "recents", "history");
     }
 
     function preventBehavior(e) { 
@@ -184,9 +171,9 @@
     PhoneGap.addConstructor(function(){
       document.addEventListener("touchmove", preventBehavior, false);
       setupToolbars();
-      uicontrols.setNavBar('My Title', 'Go Right', {
+      navigationbar.setNavBar('My Title', 'Go Right', {
         onButton: function() {
-          uicontrols.setNavBar('Another title', 'toolButton:Trash', {
+          navigationbar.setNavBar('Another title', 'toolButton:Trash', {
             onShowStart: function() {
               debug.log("New navbar item starting to show");
             },
