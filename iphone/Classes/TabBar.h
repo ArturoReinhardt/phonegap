@@ -16,6 +16,7 @@
     UITabBar* tabBar;
     NSMutableDictionary* tabBarItems;
 }
+@property (nonatomic, retain) UITabBar *tabBar;
 
 /* Tab Bar methods 
  */

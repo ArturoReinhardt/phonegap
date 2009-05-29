@@ -40,6 +40,14 @@
     return obj;
 }
 
+-(BOOL) hasCommandInstance:(NSString*)className
+{
+    if ([commandObjects objectForKey:className])
+        return YES;
+    else
+        return NO;
+}
+
 /**
  * This is main kick off after the app inits, the views and Settings are setup here.
  */

@@ -194,6 +194,13 @@
       document.addEventListener('startOrientationChange', function(e) { debug.log("Orientation changing to " + e.orientation); }, false);
       document.addEventListener('stopOrientationChange', function(e) { debug.log("Orientation changed from " + e.orientation); }, false);
       document.addEventListener('alertClosed', function(e) { debug.log("Alert box closed when user clicked button " + e.buttonIndex + " having title " + e.buttonLabel); }, false);
+      dialog.openButtonDialog(
+          'This is my title',
+          'Foo',
+          { label: 'Bar' },
+          { label: 'Baz', type: 'destroy', onClick: function() { debug.log("Destroy called") }},
+          { style: 'translucent' }
+      );
     });
     
     </script>
