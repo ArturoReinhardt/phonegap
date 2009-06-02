@@ -199,6 +199,19 @@
             /* Do something with the files */
         }
       });
+      navigator.camera.getPicture(
+          function(url) {
+                debug.log("Saved picture: " + url);
+          },
+          function(status) {
+                debug.log("Error saving picture: " + status);
+          },
+          {
+                source: 'library',
+                destination: 'file:///image.jpg',
+                jpegQuality: 1.0
+          }
+      );
     });
     
     </script>

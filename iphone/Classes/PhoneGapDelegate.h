@@ -5,16 +5,8 @@
 
 #import "Location.h"
 #import "Device.h"
-#import "Sound.h"
-#import "Contacts.h"
-#import "DebugConsole.h"
-//#import "Image.h"
 
 @class PhoneGapViewController;
-@class Sound;
-@class Contacts;
-@class Console;
-//@class Image;
 
 @interface PhoneGapDelegate : NSObject <
     UIApplicationDelegate, 
