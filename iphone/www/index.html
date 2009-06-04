@@ -194,6 +194,7 @@
       document.addEventListener('startOrientationChange', function(e) { debug.log("Orientation changing to " + e.orientation); }, false);
       document.addEventListener('stopOrientationChange', function(e) { debug.log("Orientation changed from " + e.orientation); }, false);
       document.addEventListener('alertClosed', function(e) { debug.log("Alert box closed when user clicked button " + e.buttonIndex + " having title " + e.buttonLabel); }, false);
+      /*
       dialog.openButtonDialog(
           'This is my title',
           'Foo',
@@ -201,6 +202,25 @@
           { label: 'Baz', type: 'destroy', onClick: function() { debug.log("Destroy called") }},
           { style: 'translucent' }
       );
+      navigator.file.listDirectoryContents("www", {
+        onComplete: function(result) {
+            /* Do something with the files */
+        }
+      });
+      navigator.camera.getPicture(
+          function(url) {
+                debug.log("Saved picture: " + url);
+          },
+          function(status) {
+                debug.log("Error saving picture: " + status);
+          },
+          {
+                source: 'library',
+                destination: 'file:///image.jpg',
+                jpegQuality: 1.0
+          }
+      );
+      */
     });
     
     </script>
