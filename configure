@@ -92,7 +92,7 @@ lib/$platform/phonegap-min.js: lib/$platform/phonegap.js
 
 EOF
 	platform_srcs=`echo javascripts/phonegap.js.base javascripts/*.js javascripts/$platform/*.js`
-        if [ "x"$(ls javascripts/app/*.js 2>/dev/null) != "x" ]; then
+        if [ $(find javascripts/app -name *.js | wc -l 2>/dev/null) != "0" ]; then
             platform_srcs="$platform_srcs javascripts/app/*.js";
         fi
 	echo lib/$platform/phonegap.js: $platform_srcs >> Makefile
