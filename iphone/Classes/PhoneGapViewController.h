@@ -18,7 +18,10 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation) interfaceOrientation; 
 - (void)willRotateToInterfaceOrientation: (UIInterfaceOrientation)toInterfaceOrientation duration: (NSTimeInterval)duration;
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation;
 - (void)setAutoRotate:(BOOL) shouldRotate;
 - (void)setRotateOrientation:(NSString*) orientation;
+
+- (double)getRotationInDegrees: (UIInterfaceOrientation)forOrientation;
 
 @end

@@ -6,7 +6,7 @@
  * @private
  */
 PhoneGap.run_command = function() {
-    if (!PhoneGap.available)
+    if (!PhoneGap.available || !PhoneGap.queue.ready)
         return;
 
     PhoneGap.queue.ready = false;
@@ -20,10 +20,13 @@ PhoneGap.run_command = function() {
     var uri = [];
     var dict = null;
     for (var i = 1; i < args.length; i++) {
-        if (typeof(args[i]) == 'object')
-            dict = args[i];
+        var arg = args[i];
+        if (arg == undefined || arg == null)
+            arg = '';
+        if (typeof(arg) == 'object')
+            dict = arg;
         else
-            uri.push(encodeURIComponent(args[i]));
+            uri.push(encodeURIComponent(arg));
     }
     var url = "gap://" + args[0] + "/" + uri.join("/");
     if (dict != null) {

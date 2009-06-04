@@ -7,7 +7,7 @@ function Camera() {
 }
 
 /**
- * 
+ * Gets a picture from the device's camera
  * @param {Function} successCallback
  * @param {Function} errorCallback
  * @param {Object} options

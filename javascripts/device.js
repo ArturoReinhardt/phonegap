@@ -1,6 +1,3 @@
-if (typeof(DeviceInfo) != 'object')
-    DeviceInfo = {};
-
 /**
  * this represents the mobile device, and provides properties for inspecting the model, version, UUID of the
  * phone, etc.
@@ -8,10 +5,11 @@ if (typeof(DeviceInfo) != 'object')
  */
 function Device() {
     this.available = PhoneGap.available;
-    this.model     = null;
-    this.version   = null;
-    this.gap       = null;
-    this.uuid      = null;
+    this.platform = null;
+    this.version  = null;
+    this.name     = null;
+    this.gap      = null;
+    this.uuid     = null;
     try {
         if (window['DroidGap'] != undefined && window.DroidGap.exists()) {
             this.available = true;
@@ -19,10 +17,11 @@ function Device() {
             this.uuid = window.DroidGap.getUuid();
             this.gapVersion = window.DroidGap.getVersion();
         } else {          
-            this.model     = DeviceInfo.platform;
-            this.version   = DeviceInfo.version;
-            this.gap       = DeviceInfo.gap;
-            this.uuid      = DeviceInfo.uuid;
+            this.platform = DeviceInfo.platform;
+            this.version  = DeviceInfo.version;
+            this.name     = DeviceInfo.name;
+            this.gap      = DeviceInfo.gap;
+            this.uuid     = DeviceInfo.uuid;
         }
     } catch(e) {
         this.available = false;

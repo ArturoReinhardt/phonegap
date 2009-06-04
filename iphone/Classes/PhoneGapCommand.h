@@ -8,6 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <JSON/JSON.h>
+
+@class PhoneGapDelegate;
 
 @interface PhoneGapCommand : NSObject {
     UIWebView*    webView;
@@ -18,7 +21,14 @@
 
 -(PhoneGapCommand*) initWithWebView:(UIWebView*)theWebView settings:(NSDictionary*)classSettings;
 -(PhoneGapCommand*) initWithWebView:(UIWebView*)theWebView;
--(void) setWebView:(UIWebView*) theWebView;
--(void) setSettings:(NSDictionary*) classSettings;
+
+-(id) fireCallback:(NSInteger)callbackId withArguments:(NSArray*)arguments;
+
+- (void)setFrameFor:(UIView*)control withSettings:(NSDictionary*)controlSettings;
+- (NSURL*)getLocalFileFor:(NSString*)filename;
+- (UIBarButtonSystemItem)getBarButtonSystemItemFor:(NSString*)imageName;
+
+-(PhoneGapDelegate*) appDelegate;
+-(UIViewController*) appViewController;
 
 @end
