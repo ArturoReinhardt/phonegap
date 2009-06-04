@@ -20,6 +20,7 @@
     UINavigationItem* navBarRightButton;
     NSMutableArray*   navBarEvents;
 }
+@property (nonatomic, retain) UINavigationBar *navBar;
 
 - (UIBarButtonItemStyle)getBarButtonStyleFor:(NSString*)string;
 

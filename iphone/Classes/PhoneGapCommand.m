@@ -12,6 +12,8 @@
 @synthesize webView;
 @synthesize settings;
 
+static PhoneGapCommand *sharedSingletonInstance = nil;
+
 -(PhoneGapCommand*) initWithWebView:(UIWebView*)theWebView settings:(NSDictionary*)classSettings
 {
     self = [self initWithWebView:theWebView];

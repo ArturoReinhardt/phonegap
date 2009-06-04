@@ -40,6 +40,7 @@
 @property (nonatomic, retain) NSString *jsAppName;
 
 -(id) getCommandInstance:(NSString*)className;
+-(BOOL) hasCommandInstance:(NSString*)className;
 + (NSDictionary*)getBundlePlist:(NSString *)plistName;
 
 @end
