@@ -1,9 +1,11 @@
 /**
- * This class exposes mobile phone interface controls to JavaScript, such as
- * native tab and tool bars, etc.
+ * This class exposes the current mobile phone's native implementation of
+ * a tab bar control.  Instead of re-implementing controls in HTML/CSS to
+ * look like the native controls, this class exposes the actual controls
+ * to JavaScript.
  * @constructor
  */
-function UIControls() {
+function TabBar() {
     this.tabBarTag = 0;
     this.tabBarCallbacks = {};
 }
@@ -11,7 +13,7 @@ function UIControls() {
 /**
  * Create a native tab bar that can have tab buttons added to it which can respond to events.
  */
-UIControls.prototype.createTabBar = function() {};
+TabBar.prototype.createTabBar = function() {};
 
 /**
  * Show a tab bar.  The tab bar has to be created first.
@@ -19,12 +21,12 @@ UIControls.prototype.createTabBar = function() {};
  * - \c height integer indicating the height of the tab bar (default: \c 49)
  * - \c position specifies whether the tab bar will be placed at the \c top or \c bottom of the screen (default: \c bottom)
  */
-UIControls.prototype.showTabBar = function(options) {};
+TabBar.prototype.showTabBar = function(options) {};
 
 /**
  * Hide a tab bar.  The tab bar has to be created first.
  */
-UIControls.prototype.hideTabBar = function(animate) {};
+TabBar.prototype.hideTabBar = function(animate) {};
 
 /**
  * Create a new tab bar item for use on a previously created tab bar.  Use ::showTabBarItems to show the new item on the tab bar.
@@ -51,7 +53,7 @@ UIControls.prototype.hideTabBar = function(animate) {};
  * @param {Object} [options] Options for customizing the individual tab item
  *  - \c badge value to display in the optional circular badge on the item; if null or unspecified, the badge will be hidden
  */
-UIControls.prototype.createTabBarItem = function(name, label, image, options) {};
+TabBar.prototype.createTabBarItem = function(name, label, image, options) {};
 
 /**
  * Update an existing tab bar item to change its badge value.
@@ -59,7 +61,7 @@ UIControls.prototype.createTabBarItem = function(name, label, image, options) {}
  * @param {Object} options Options for customizing the individual tab item
  *  - \c badge value to display in the optional circular badge on the item; if null or unspecified, the badge will be hidden
  */
-UIControls.prototype.updateTabBarItem = function(name, options) {};
+TabBar.prototype.updateTabBarItem = function(name, options) {};
 
 /**
  * Show previously created items on the tab bar
@@ -69,7 +71,7 @@ UIControls.prototype.updateTabBarItem = function(name, options) {};
  * @see createTabBarItem
  * @see createTabBar
  */
-UIControls.prototype.showTabBarItems = function(tabs, options) {};
+TabBar.prototype.showTabBarItems = function(tabs, options) {};
 
 /**
  * Manually select an individual tab bar item, or nil for deselecting a currently selected tab bar item.
@@ -77,28 +79,17 @@ UIControls.prototype.showTabBarItems = function(tabs, options) {};
  * @see createTabBarItem
  * @see showTabBarItems
  */
-UIControls.prototype.selectTabBarItem = function(tab) {};
+TabBar.prototype.selectTabBarItem = function(tab) {};
 
 /**
  * Function called when a tab bar item has been selected.
  * @param {Number} tag the tag number for the item that has been selected
  */
-UIControls.prototype.tabBarItemSelected = function(tag) {
+TabBar.prototype.tabBarItemSelected = function(tag) {
     if (typeof(this.tabBarCallbacks[tag]) == 'function')
         this.tabBarCallbacks[tag]();
 };
 
-/**
- * Create a toolbar.
- */
-UIControls.prototype.createToolBar = function() {};
-
-/**
- * Function called when a tab bar item has been selected.
- * @param {String} title the title to set within the toolbar
- */
-UIControls.prototype.setToolBarTitle = function(title) {};
-
 PhoneGap.addConstructor(function() {
-    window.uicontrols = new UIControls();
+    window.tabbar = new TabBar();
 });

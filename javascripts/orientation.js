@@ -4,10 +4,29 @@
  */
 function Orientation() {
 	/**
-	 * The last known orientation.
+	 * The current orientation, or null if the orientation hasn't changed yet.
 	 */
-	this.lastOrientation = null;
+	this.currentOrientation = null;
 }
+
+/**
+ * Set the current orientation of the phone.  This is called from the device automatically.
+ * 
+ * When the orientation is changed, the DOMEvent \c orientationChanged is dispatched against
+ * the document element.  The event has the property \c orientation which can be used to retrieve
+ * the device's current orientation, in addition to the \c Orientation.currentOrientation class property.
+ *
+ * @param {Number} orientation The orientation to be set, in degrees
+ * @param {Number} duration The duration the animation will take, in miliseconds
+ */
+Orientation.prototype.setOrientation = function(orientation, duration) {
+    Orientation.currentOrientation = orientation;
+    var e = document.createEvent('Events');
+    e.initEvent('startOrientationChange', 'false', 'false');
+    e.orientation = orientation;
+    e.duration = duration;
+    document.dispatchEvent(e);
+};
 
 /**
  * Asynchronously aquires the current orientation.
@@ -19,7 +38,7 @@ function Orientation() {
 Orientation.prototype.getCurrentOrientation = function(successCallback, errorCallback) {
 	// If the position is available then call success
 	// If the position is not available then call error
-}
+};
 
 /**
  * Asynchronously aquires the orientation repeatedly at a given interval.
@@ -35,7 +54,7 @@ Orientation.prototype.watchOrientation = function(successCallback, errorCallback
 	return setInterval(function() {
 		navigator.orientation.getCurrentOrientation(successCallback, errorCallback);
 	}, 10000);
-}
+};
 
 /**
  * Clears the specified orientation watch.
@@ -43,7 +62,7 @@ Orientation.prototype.watchOrientation = function(successCallback, errorCallback
  */
 Orientation.prototype.clearWatch = function(watchId) {
 	clearInterval(watchId);
-}
+};
 
 PhoneGap.addConstructor(function() {
     if (typeof navigator.orientation == "undefined") navigator.orientation = new Orientation();

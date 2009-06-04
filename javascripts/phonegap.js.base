@@ -12,6 +12,7 @@ PhoneGap = {
         commands: [],
         timer: null
     },
+    callbacks: [],
     _constructors: []
 };
 
@@ -73,3 +74,40 @@ PhoneGap.exec = function() {
 PhoneGap.run_command = function() {
 };
 
+/**
+ * Register a callback function in JavaScript with a call into the device.  It assigns a unique identifier to the call/callback pair
+ * that will allow PhoneGap commands to invoke JavaScript functions when events occur.  Use these with caution, because these references
+ * have to be manually deleted, as there is no automatic way to determine when a callback function is no longer needed.
+ * @param {Function} callback Callback function to bind with an ID
+ * @returns {Number} Unique identifier used to represent this callback function
+ */
+PhoneGap.registerCallback = function(cb) {
+    if (typeof(cb) != 'function')
+        return null;
+
+    // XXX DON'T pop from this array, ever...don't even think about it.  That would shift all the IDs, and fire all the wrong events.
+    // This would generally be considered a "Bad Thing" by most people.  So don't do it.  If you want to remove a callback, set its
+    // value to null...or use unregisterCallback;
+    return PhoneGap.callbacks.push(cb);
+};
+
+/**
+ * Safely removes a callback that had previously been created by registerCallback.
+ * @param {Number} id Unique identifier returned from registerCallback
+ */
+PhoneGap.unregisterCallback = function(id) {
+    PhoneGap.callbacks[id - 1] = null;
+}
+
+/**
+ * Calls a callback based on its registered unique ID.  This will typically be called directly from the device.
+ * @param {Number} id Unique identifier representing a callback
+ * @param {Array} args Arguments to be passed into the function
+ * @returns {Object} returns whatever the callback returns, or \c null if the function has been removed.
+ */
+PhoneGap.invokeCallback = function(id, args) {
+    var idx = id - 1;
+    if (typeof(PhoneGap.callbacks[idx]) != 'function')
+        return null;
+    return PhoneGap.callbacks[idx].apply(null, args);
+}

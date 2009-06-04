@@ -14,20 +14,120 @@
 
 @implementation Image
 
-@synthesize window;
+/**
+ Open the device's image picker interface to allow the user to select or take a picture to use.
+ @param arguments[0] success callback
+ @param arguments[1] error callback
+ @param options[source] source to take the picture from; one of camera, library, or saved (default: library)
+ @param options[destination] where to save the picture to, file:// or http:// only
+ @param options[jpegQuality] compression quality used only for JPEG destination types; between 0.0 and 1.0
+ */
+- (void)openImagePicker:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options
+{
+    NSString *imageSource = @"library";
+    if ([options objectForKey:@"source"])
+        imageSource = [options objectForKey:@"source"];
+    
+    NSNumber *successCallback;
+    if ([arguments count] > 0)
+        successCallback = [NSNumber numberWithInt:[[arguments objectAtIndex:0] intValue]];
+    else
+        successCallback = [NSNumber numberWithInt:0];
+    
+    NSNumber *errorCallback;
+    if ([arguments count] > 1)
+        errorCallback = [NSNumber numberWithInt:[[arguments objectAtIndex:1] intValue]];
+    else
+        errorCallback = [NSNumber numberWithInt:0];
 
-// TODO Move to Image.m
+    if ([imageSource isEqualToString:@"camera"] && ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        [self fireCallback:[errorCallback intValue]
+             withArguments:[NSArray arrayWithObject:@"Device does not support the \"camera\" source"]];
+        return;
+    }
+    
+    UIImagePickerController* picker = [[UIImagePickerController alloc] init];
+    if ([imageSource isEqualToString:@"camera"])
+        picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+    else if ([imageSource isEqualToString:@"library"])
+        picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    else if ([imageSource isEqualToString:@"saved"])
+        picker.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
+    else {
+        [self fireCallback:[errorCallback intValue]
+             withArguments:[NSArray arrayWithObject:[NSString stringWithFormat:@"Unknown image source type \"%@\" specified", imageSource]]];
+        return;
+    }
+    picker.delegate = self;
+    picker.allowsImageEditing = YES;
+    
+    // Picker is displayed asynchronously.
+    PhoneGapDelegate *gap = (PhoneGapDelegate*)[UIApplication sharedApplication].delegate;
+    PhoneGapViewController *controller = gap.viewController;
+    [controller presentModalViewController:picker animated:YES];
+    
+    imagePickerOptions = [[NSMutableDictionary dictionaryWithCapacity:5] retain];
+    [imagePickerOptions setObject:successCallback forKey:@"successCallback"];
+    [imagePickerOptions setObject:errorCallback forKey:@"errorCallback"];
+    
+    /**
+     imageQuality - Floating-point value between 0.0 and 1.0 indicating the compression quality you want
+     */
+    NSNumber *quality = [NSNumber numberWithFloat:[[options objectForKey:@"jpegQuality"] floatValue]];
+    if (quality && [quality floatValue] >= 0.0f && [quality floatValue] <= 1.0f)
+        [imagePickerOptions setValue:quality forKey:@"jpegQuality"];
+    else
+        [imagePickerOptions setValue:[NSNumber numberWithFloat:0.75f] forKey:@"jpegQuality"];
+    
+    /**
+     destination - Destination URL (http://someserver/image.jpg or file:///image.jpg) to save the image to. 
+     */
+    NSString *destURL = [options objectForKey:@"destination"];
+    [imagePickerOptions setValue:destURL forKey:@"destination"];
+}
+
+
 - (void)imagePickerController:(UIImagePickerController *)thePicker didFinishPickingImage:(UIImage *)theImage editingInfo:(NSDictionary *)editingInfo
 {
-	
-	//modified by urbian.org - g.mueller @urbian.org
-	
+    NSLog(@"Picked photo %@", theImage);
+    [[thePicker parentViewController] dismissModalViewControllerAnimated:YES];
+
     NSLog(@"photo: picked image");
+    NSInteger successCallback = [[imagePickerOptions objectForKey:@"successCallback"] integerValue];
+    NSInteger errorCallback = [[imagePickerOptions objectForKey:@"errorCallback"] integerValue];
+
+    NSString *urlString = [imagePickerOptions objectForKey:@"destination"];
+	NSData *imageData;
+    if ([[[urlString pathExtension] lowercaseString] isEqualToString:@"png"])
+        imageData = UIImagePNGRepresentation(theImage);
+    else
+        imageData = UIImageJPEGRepresentation(theImage, [(NSNumber*)[imagePickerOptions objectForKey:@"jpegQuality"] floatValue]);
 	
-	NSData * imageData = UIImageJPEGRepresentation(theImage, 0.75);
-	
-	NSString *urlString = [@"http://" stringByAppendingString:photoUploadUrl]; // upload the photo to this url
-	
+    NSURL *saveUrl = [NSURL URLWithString:urlString];
+    if ([saveUrl isFileURL]) {
+        if ([[saveUrl path] length] < 1) {
+            NSLog(@"File URL didn't have a path to it; are you sure you used file:///foo.ext?");
+            [self fireCallback:errorCallback
+                 withArguments:[NSArray arrayWithObjects:@"Could not find the filename in the supplied file URL", urlString, nil]];
+            return;
+        }
+        NSString *filePath = [NSString stringWithFormat:@"%@%@", [[NSBundle mainBundle] bundlePath], [saveUrl path]];
+        NSLog(@"File path: %@", filePath);
+        BOOL result = [[NSFileManager defaultManager] createFileAtPath:filePath contents:imageData attributes:nil];
+        if (result) {
+            NSLog(@"Saved %@ successfully", filePath);
+            [self fireCallback:successCallback
+                 withArguments:[NSArray arrayWithObjects:urlString, [saveUrl path], nil]];
+        } else {
+            NSLog(@"Couldn't save %@", filePath);
+            [self fireCallback:errorCallback
+                 withArguments:[NSArray arrayWithObjects:[NSString stringWithFormat:@"Could not save the file to \"%@\"", filePath], urlString, nil]];
+        }
+        [imagePickerOptions release];
+        return;
+    }
+    
+    /*
 	NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] init] autorelease];
 	[request setURL:[NSURL URLWithString:urlString]];
 	[request setHTTPMethod:@"POST"];
@@ -68,13 +168,26 @@
 	
 	webView.hidden = NO;
 	[window bringSubviewToFront:webView];
-	
+*/	
+    [imagePickerOptions release];
+    return;
 }
 
 
-// TODO Move to Image.m
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)thePicker
 {
+    NSInteger successCallback = [[imagePickerOptions objectForKey:@"successCallback"] integerValue];
+    NSInteger errorCallback = [[imagePickerOptions objectForKey:@"errorCallback"] integerValue];
+
+    NSLog(@"Cancelled photo picker");
+    [[thePicker parentViewController] dismissModalViewControllerAnimated:YES];
+    [self fireCallback:errorCallback
+         withArguments:[NSArray arrayWithObjects:@"The user clicked cancel", [imagePickerOptions objectForKey:@"destination"]]];
+    [imagePickerOptions release];
+    
+//    [webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"
+
+/*
 	// Dismiss the image selection and close the program
 	[[thePicker parentViewController] dismissModalViewControllerAnimated:YES];
 	
@@ -89,15 +202,15 @@
 	NSLog(@"Photo Cancel Request");
 	webView.hidden = NO;
 	[window bringSubviewToFront:webView];
+ */
 }
 
 
+/*
 
-// TODO Move to Image.m
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
 	
 	NSLog(@"photo: upload finished!");
-	
 	//added by urbian.org - g.mueller
 	NSString *aStr = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
 	
@@ -123,11 +236,10 @@
     // release the connection, and the data object
     [conn release];
     [receivedData release];
-	
 }
+ */
 
-
-// TODO Move to Image.m
+/*
 -(void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *) response {
 	
 	//added by urbian.org
@@ -144,15 +256,15 @@
     [receivedData appendData:data];
     NSLog(@"photo: progress");
 }
-
+*/
 
 /*
  * Failed with Error
  */
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    NSLog([@"photo: upload failed! " stringByAppendingString:[error description]]);
-    
-}
+//- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+//    NSLog([@"photo: upload failed! " stringByAppendingString:[error description]]);
+//    
+//}
 
 
 

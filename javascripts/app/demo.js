@@ -1,14 +1,9 @@
-PhoneGap.addConstructor(function(){
-  document.addEventListener("touchmove", preventBehavior, false);
-  setupToolbars();
-  deviceInfo();
-});
-
 function deviceInfo(){
   debug.log("deviceInfo");
-  document.getElementById("platform").innerHTML = device.model;
-  document.getElementById("version").innerHTML = device.version;
-  document.getElementById("uuid").innerHTML = device.uuid;
+  document.getElementById("platform").innerHTML   = device.platform;
+  document.getElementById("version").innerHTML    = device.version;
+  document.getElementById("devicename").innerHTML = device.name;
+  document.getElementById("uuid").innerHTML       = device.uuid;
 }
 
 function getLocation() {
@@ -16,6 +11,7 @@ function getLocation() {
   navigator.notification.activityStart();
   var suc = function(p){
     debug.log(p.latitude + " " + p.longitude);
+    navigator.notification.alert(p.latitude + " " + p.longitude, "Your GeoLocation", "Thanks");
     navigator.notification.activityStop();
   };
   var fail = function(){};
@@ -23,7 +19,7 @@ function getLocation() {
 }
 
 function customAlert(){
-  navigator.notification.alert("Custom alert", "Custom title", "Yup!");
+  navigator.notification.alert("Custom alert", "Custom title", "Yup!", "Nope", { onClose: function(index, label) { debug.log("alert's onClick callback called on button " + index + " (" + label + ")") } });
 }
 
 function beep(){
@@ -36,15 +32,73 @@ function vibrate(){
   navigator.notification.vibrate(0);
 }
 
-function getContact(){
-  debug.log("getContact");
-  var suc = function(c){
-    debug.log(c);
-    alert("Contact 4: " + c.contacts[3].name);
-  };
-  var fail = function(){};
-  navigator.ContactManager.get(suc, fail);
+function getContactsPrompt(){
+  debug.log("getContactsPrompt");
+      
+            var pageSize = prompt("Page size", 10);
+            if (pageSize) {
+                    var pageNumber = prompt("Page number", 1);
+                    if (pageNumber) {
+                            getContacts(parseInt(pageSize), parseInt(pageNumber));
+                    }
+            }
 }
+
+function getContacts(pageSize, pageNumber){
+  debug.log("getContacts");
+  var fail = function(){};
+      var options = null;
+      
+      if (pageSize && pageNumber)
+            options = { 'pageSize': pageSize, 'pageNumber': pageNumber };
+      
+  navigator.ContactManager.allContacts(getContacts_Return, fail, options);
+}
+    
+    function getContacts_Return(contactsArray)
+    {
+            var names = "";
+            
+            for (var i = 0; i < contactsArray.length; i++) {
+                    var con = new Contact();
+                    con.firstName = contactsArray[i].firstName;
+                    con.lastName = contactsArray[i].lastName;
+                    con.phoneNumber = contactsArray[i].phoneNumber;
+                    con.address = contactsArray[i].address;	
+                    names += con.displayName();
+                    
+                    if (i+1 != contactsArray.length)
+                            names += ",";
+            }
+            
+            alert(names);
+    }
+    
+    function contactsCount(){
+  debug.log("contactCount");
+  navigator.ContactManager.contactsCount(showContactsCount);
+}
+    
+    function showContactsCount(count){
+            alert("Number of contacts: " + count);
+    }
+
+    function addContact(gui){
+            var sample_contact = { 'firstName': 'John', 'lastName' : 'Smith' };
+    
+            if (gui) {
+                    navigator.ContactManager.newContact(sample_contact, null, { 'gui': true });
+            } else {
+                    var firstName = prompt("Enter a first name", sample_contact.firstName);
+                    if (firstName) {
+                            var lastName = prompt("Enter a last name", sample_contact.lastName);
+                            if (lastName) {
+                                    sample_contact = { 'firstName': firstName, 'lastName' : lastName };
+                                    navigator.ContactManager.newContact(sample_contact);
+                            }
+                    }
+            }
+    }
 
 function watchAccel() {
   debug.log("watchAccel");
@@ -66,56 +120,85 @@ function roundNumber(num) {
 }
 
 function setupToolbars() {
-   uicontrols.createTabBar();
+   tabbar.createTabBar();
 
    var toprated = 0;
-   uicontrols.createTabBarItem("toprated", "Top Rated", "tabButton:TopRated", {
+   tabbar.createTabBarItem("toprated", "Top Rated", "tabButton:TopRated", {
        onSelect: function() {
            navigator.notification.alert("Top Rated selected");
-           uicontrols.updateTabBarItem("toprated", { badge: ++toprated });
+           tabbar.updateTabBarItem("toprated", { badge: ++toprated });
        }
    });
 
    var recents = 0;
-   uicontrols.createTabBarItem("recents", "Recents", null, {
+   tabbar.createTabBarItem("recents", "Recents", null, {
        onSelect: function() {
            navigator.notification.alert("Recents selected");
-           uicontrols.updateTabBarItem("recents", { badge: ++recents });
+           tabbar.updateTabBarItem("recents", { badge: ++recents });
        }
    });
 
    var history = 0;
-   uicontrols.createTabBarItem("history", "History", "icon.png", {
+   tabbar.createTabBarItem("history", "History", "icon.png", {
        onSelect: function() {
            navigator.notification.alert("History selected");
-           uicontrols.updateTabBarItem("history", { badge: ++history });
+           tabbar.updateTabBarItem("history", { badge: ++history });
        }
    });
 
-   var more = false;
-   uicontrols.createTabBarItem("more", "More", "tabButton:More", {
-       onSelect: function() {
-           if (more) {
-               uicontrols.showTabBarItems("search", "downloads", "more");
-           } else {
-               uicontrols.showTabBarItems("toprated", "recents", "history", "more");
-           }
-           uicontrols.selectTabBarItem(null);
-           more = !more;
-       }
-   });
+   tabbar.createTabBarItem("search", "Search", "tabButton:Search");
+   tabbar.createTabBarItem("downloads", "Downloads", "tabButton:Downloads");
 
-   try {
-   uicontrols.createTabBarItem("search", "Search", "tabButton:Search");
-   uicontrols.createTabBarItem("downloads", "Downloads", "tabButton:Downloads");
-   } catch(e) { debug.log(e) }
-
-   uicontrols.showTabBar();
-   uicontrols.showTabBarItems("toprated", "recents", "history", "more");
-
-   uicontrols.setToolBarTitle("PhoneGap Demo");
+   tabbar.showTabBar();
+   tabbar.showTabBarItems("toprated", "recents", "history");
 }
 
 function preventBehavior(e) { 
   e.preventDefault(); 
 };
+
+PhoneGap.addConstructor(function(){
+  document.addEventListener("touchmove", preventBehavior, false);
+  setupToolbars();
+  navigationbar.setNavBar('My Title', 'Go Right', {
+    onButton: function() {
+      navigationbar.setNavBar('Another title', 'toolButton:Trash', {
+        onShowStart: function() {
+          debug.log("New navbar item starting to show");
+        },
+        onShow: function() {
+          debug.log("New navbar item shown");
+        },
+        onHideStart: function() {
+          debug.log("New navbar item starting to go away");
+        },
+        onHide: function() {
+          debug.log("New navbar item has gone away");
+        }
+      });
+    }
+  });
+
+  deviceInfo();
+  document.addEventListener('startOrientationChange', function(e) { debug.log("Orientation changing to " + e.orientation); }, false);
+  document.addEventListener('stopOrientationChange', function(e) { debug.log("Orientation changed from " + e.orientation); }, false);
+  document.addEventListener('alertClosed', function(e) { debug.log("Alert box closed when user clicked button " + e.buttonIndex + " having title " + e.buttonLabel); }, false);
+  navigator.file.listDirectoryContents("www", {
+    onComplete: function(result) {
+        /* Do something with the files */
+    }
+  });
+  navigator.camera.getPicture(
+      function(url) {
+            debug.log("Saved picture: " + url);
+      },
+      function(status) {
+            debug.log("Error saving picture: " + status);
+      },
+      {
+            source: 'library',
+            destination: 'file:///image.jpg',
+            jpegQuality: 1.0
+      }
+  );
+});
