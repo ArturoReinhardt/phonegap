@@ -8,19 +8,29 @@
  *
  */
 
-#import <AddressBook/AddressBook.h>
-#import <AddressBookUI/ABNewPersonViewController.h>
-#import <UIKit/UIApplication.h>
 #import "Contacts.h"
+#import <UIKit/UIKit.h>
 #import "PhoneGapDelegate.h"
-//#include "Categories.h"
+#import "Categories.h"
+#import "Notification.h"
+#import "OCCFObject.h"
+#import "OCABRecord.h"
+#import "OCABMutableMultiValue.h"
+
+@implementation ContactsPicker
+
+@synthesize allowsEditing;
+@synthesize jsCallback;
+
+@end
+
 
 @implementation Contacts
 
 void addressBookChanged(ABAddressBookRef addressBook, CFDictionaryRef info, void* context)
 {
 	// note that this function is only called when another AddressBook instance modifies 
-	// the address book, not the current one
+	// the address book, not the current one. For example, through an OTA MobileMe sync
 	Contacts* contacts = (Contacts*)context;
 	[contacts addressBookDirty];
 }
@@ -39,20 +49,20 @@ void addressBookChanged(ABAddressBookRef addressBook, CFDictionaryRef info, void
 - (void) contactsCount:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options
 {
 	NSUInteger argc = [arguments count];
-	NSString* jcallback = nil;
+	NSString* jsCallback = nil;
 	
 	if (argc > 0) {
-		jcallback = [arguments objectAtIndex:0];
+		jsCallback = [arguments objectAtIndex:0];
 	} else {
 		NSLog(@"Contacts.contactsCount: Missing 1st parameter.");
 		return;
 	}
 	
 	CFIndex numberOfPeople = ABAddressBookGetPersonCount(addressBook);
-	NSString* str = [[NSString alloc] initWithFormat:@"%@(%d);", jcallback, numberOfPeople];
+	NSString* jsString = [[NSString alloc] initWithFormat:@"%@(%d);", jsCallback, numberOfPeople];
 	
-    [webView stringByEvaluatingJavaScriptFromString:str];
-	[str release];
+    [webView stringByEvaluatingJavaScriptFromString:jsString];
+	[jsString release];
 }
 
 - (void) allContacts:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options
@@ -66,11 +76,25 @@ void addressBookChanged(ABAddressBookRef addressBook, CFDictionaryRef info, void
 		NSLog(@"Contacts.allContacts: Missing 1st parameter.");
 		return;
 	}
-	
+		
 	NSMutableString* jsArray = [[NSMutableString alloc] init];
 	[jsArray appendString:@"["];
 	
-	CFIndex numberOfPeople = ABAddressBookGetPersonCount(addressBook);
+	NSString* filter = [options valueForKey:@"nameFilter"];
+	CFArrayRef records = NULL;
+	CFIndex numberOfPeople = 0;
+
+	if (filter) {
+		records =  ABAddressBookCopyPeopleWithName(addressBook, (CFStringRef)filter);
+		numberOfPeople = CFArrayGetCount(records);
+	} else {
+		if (allPeople == nil) { // lazy loading
+			allPeople = (NSArray*)ABAddressBookCopyArrayOfAllPeople(addressBook);
+		}
+		records = (CFArrayRef)allPeople;
+		numberOfPeople = ABAddressBookGetPersonCount(addressBook);
+	}
+	
 	CFIndex pageSize = [options integerValueForKey:@"pageSize" defaultValue:numberOfPeople withRange:NSMakeRange(1, numberOfPeople)];
 	
 	NSUInteger maxPages = ceil((double)numberOfPeople / (double)pageSize);
@@ -78,62 +102,30 @@ void addressBookChanged(ABAddressBookRef addressBook, CFDictionaryRef info, void
 	
 	CFIndex skipAmount = (pageNumber - 1) * pageSize;
 	CFIndex maxIndex = (skipAmount + pageSize);
-	
-	if (allPeople == nil) {
-		allPeople = (NSArray*)ABAddressBookCopyArrayOfAllPeople(addressBook);
-	}
-	
-	for (int i = skipAmount; i < maxIndex; i++) 
+	CFIndex i;
+
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init]; 
+	for (i = skipAmount; i < maxIndex; i++) 
 	{ 
-		ABRecordRef rec = CFArrayGetValueAtIndex((CFArrayRef)allPeople, i);
+		OCABRecord* rec = [[OCABRecord alloc] initWithCFTypeRef:CFArrayGetValueAtIndex(records, i)];
+		[jsArray appendString:[rec JSONValue]];
+		[rec release];
 		
-		if (ABRecordCopyValue(rec, kABPersonFirstNameProperty) != nil && ABRecordCopyValue(rec, kABPersonLastNameProperty) != nil) 
-		{
-			CFStringRef firstName = ABRecordCopyValue(rec, kABPersonFirstNameProperty);
-			CFStringRef lastName = ABRecordCopyValue(rec, kABPersonLastNameProperty);		
-			NSMutableString* phoneArray =  [[NSMutableString alloc] initWithString:@"{"];
-
-			CFStringRef phoneNumber, phoneNumberLabel;
-			ABMutableMultiValueRef multi = ABRecordCopyValue(rec, kABPersonPhoneProperty);
-			CFIndex phoneNumberCount = ABMultiValueGetCount(multi);
-			
-			for (CFIndex j = 0; j < phoneNumberCount; j++) {
-				phoneNumberLabel = ABMultiValueCopyLabelAtIndex(multi, j); // note that this will be a general label, for you to localize yourself
-				phoneNumber      = ABMultiValueCopyValueAtIndex(multi, j);
-				
-				NSString* pair = [[NSString alloc] initWithFormat:@"'%@':'%@'", (NSString*)phoneNumberLabel,(NSString*) phoneNumber];
-				[phoneArray appendFormat:@"%@", pair];
-				[pair release];
-
-				if (j+1 != phoneNumberCount) {
-					[phoneArray appendFormat:@","];
-				}
-				
-				CFRelease(phoneNumberLabel);
-				CFRelease(phoneNumber);
-			}
-			[phoneArray appendString:@"}"];
-			
-			NSString* contactStr = [[NSString alloc] initWithFormat:@"{'firstName':'%@','lastName' : '%@', 'phoneNumber':%@, 'address':'%@'}", firstName, lastName, phoneArray, @""];
-			[jsArray appendFormat:@"%@", contactStr];
-			
-			if (i+1 != maxIndex) {
-				[jsArray appendFormat:@","];
-			}
-			
-			[contactStr release];
-			CFRelease(firstName);
-			CFRelease(lastName);
-			CFRelease(phoneArray);
+		if (i+1 != maxIndex) {
+			[jsArray appendString:@","];
 		}
 	}
-	
+	[pool release];
 	[jsArray appendString:@"]"];
 	
 	NSString* jsString = [[NSString alloc] initWithFormat:@"%@(%@);", jsCallback, jsArray];
     NSLog(@"%@", jsString);
-
+	
     [webView stringByEvaluatingJavaScriptFromString:jsString];
+	
+	if (filter) {
+		CFRelease(records);
+	}
 	
 	[jsArray release];
 	[jsString release];
@@ -142,42 +134,61 @@ void addressBookChanged(ABAddressBookRef addressBook, CFDictionaryRef info, void
 - (void) newContact:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
 {	
 	NSUInteger argc = [arguments count];
-	NSString* firstName = nil, *lastName = nil;
+	NSString* firstName = nil, *lastName = nil, *phoneNumber = nil;
 	
 	if (argc > 0) firstName = [arguments objectAtIndex:0];
 	if (argc > 1) lastName = [arguments objectAtIndex:1];
+	if (argc > 2) phoneNumber = [arguments objectAtIndex:2];
 	
-	ABRecordRef persona = ABPersonCreate();
-	ABRecordSetValue(persona, kABPersonFirstNameProperty, firstName , nil);
-	ABRecordSetValue(persona, kABPersonLastNameProperty, lastName, nil);
+	OCABRecord* rec = [[OCABRecord alloc] initWithCFTypeRef:ABPersonCreate()];
+	[rec setFirstName: firstName];
+	[rec setLastName: lastName];
+	
+	if (phoneNumber) {
+		[rec setPhoneNumber:phoneNumber withLabel:(NSString*)kABPersonPhoneMainLabel];
+	}
+	
 	//TODO: add more items to set here, from arguments
 	
 	if ([options existsValue:@"true" forKey:@"gui"]) {
 		ABNewPersonViewController* npController = [[[ABNewPersonViewController alloc] init] autorelease];
 		
-		npController.displayedPerson = persona;
+		npController.displayedPerson = [rec ABRecordRef];
 		npController.addressBook = addressBook;
 		npController.newPersonViewDelegate = self;
 
 		UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:npController] autorelease];
-		PhoneGapDelegate* delg = (PhoneGapDelegate*)[[UIApplication sharedApplication] delegate];
-		
-		UIViewController* viewController = (UIViewController*)[delg viewController];
-		[viewController presentModalViewController:navController animated: YES];
+		[[super appViewController] presentModalViewController:navController animated: YES];
 	} 
 	else {
-		ABAddressBookAddRecord(addressBook, persona, nil);
-		ABAddressBookSave(addressBook, nil);
-		[self addressBookDirty];
+		CFErrorRef errorRef;
+		bool addOk = false, saveOk = false;
+
+		addOk = ABAddressBookAddRecord(addressBook, [rec ABRecordRef], &errorRef);
+		if (addOk) {
+			saveOk = ABAddressBookSave(addressBook, &errorRef);
+		}
+		if (saveOk) {
+			[self addressBookDirty];
+		}
+		
+		NSString* jsCallback = [options valueForKey:@"successCallback"];
+		NSString* firstParam = (addOk && saveOk)? [rec JSONValue] : @"";
+		
+		if (jsCallback) {
+			NSString* jsString = [[NSString alloc] initWithFormat:@"%@(%@);", jsCallback, firstParam];
+			[webView stringByEvaluatingJavaScriptFromString:jsString];
+			
+			[jsString release];
+		}
 	}
 	
-	CFRelease(persona);
+	[rec release];
 }
 
 - (void) newPersonViewController:(ABNewPersonViewController*)newPersonViewController didCompleteWithNewPerson:(ABRecordRef)person
 {
-	if (person != NULL)
-	{
+	if (person != NULL) {
 		[self addressBookDirty];
 	}
 	[newPersonViewController dismissModalViewControllerAnimated:YES]; 
@@ -185,7 +196,163 @@ void addressBookChanged(ABAddressBookRef addressBook, CFDictionaryRef info, void
 
 - (void) displayContact:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options
 {
-	NSLog(@"TODO: display contact");
+	NSUInteger argc = [arguments count];
+	ABRecordID recordID = kABRecordInvalidID;
+	NSString* errorCallback = nil;
+	
+	//TODO: need better argument handling system
+	if (argc > 0) {
+		recordID = [[arguments objectAtIndex:0] intValue];
+	} else {
+		NSLog(@"Contacts.displayContact: Missing 1st parameter.");
+		return;
+	}
+	
+	if (argc > 1) {
+		errorCallback = [arguments objectAtIndex:1];
+	}
+	
+	bool allowsEditing = [options existsValue:@"true" forKey:@"allowsEditing"];
+	
+	OCABRecord* rec = [OCABRecord CreateFromRecordID:recordID andAddressBook:addressBook];
+	if (rec) {
+		ABPersonViewController* personController = [[[ABPersonViewController alloc] init] autorelease];
+		personController.displayedPerson = [rec ABRecordRef];
+		personController.personViewDelegate = self;
+		personController.allowsEditing = allowsEditing;
+		
+		UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc]
+										  initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+										  target: self
+										  action: @selector(dimissModalView:)];
+		
+		personController.navigationItem.leftBarButtonItem = cancelButton;
+		[cancelButton release];												
+
+		UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:personController] autorelease];
+		[[super appViewController] presentModalViewController:navController animated: YES];
+		
+		[rec release];
+	} 
+	else 
+	{
+		if (errorCallback) {
+			NSString* jsString = [[NSString alloc] initWithFormat:@"%@('Contacts.displayContact: Record id %d not found.');", 
+								  errorCallback, recordID];
+			NSLog(@"%@", jsString);
+			
+			[webView stringByEvaluatingJavaScriptFromString:jsString];
+			[jsString release];
+		}
+	}
+}
+
+- (void) dimissModalView:(id)sender 
+{
+	UIViewController* controller = ([super appViewController]);
+	[controller.modalViewController dismissModalViewControllerAnimated:YES]; 
+}
+								   
+- (BOOL) personViewController:(ABPersonViewController *)personViewController shouldPerformDefaultActionForPerson:(ABRecordRef)person 
+					 property:(ABPropertyID)property identifier:(ABMultiValueIdentifier)identifierForValue
+{
+	return YES;
+}
+
+- (void) chooseContact:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options
+{
+	NSUInteger argc = [arguments count];
+	NSString* jsCallback = nil;
+	
+	//TODO: need better argument handling system
+	if (argc > 0) {
+		jsCallback = [arguments objectAtIndex:0];
+	} else {
+		NSLog(@"Contacts.chooseContact: Missing 1st parameter.");
+		return;
+	}
+	
+	ContactsPicker* pickerController = [[[ContactsPicker alloc] init] autorelease];
+	pickerController.peoplePickerDelegate = self;
+	pickerController.jsCallback = jsCallback;
+	pickerController.allowsEditing = (BOOL)[options existsValue:@"true" forKey:@"allowsEditing"];
+	
+	[[super appViewController] presentModalViewController:pickerController animated: YES];
+}
+
+- (BOOL) peoplePickerNavigationController:(ABPeoplePickerNavigationController*)peoplePicker 
+	     shouldContinueAfterSelectingPerson:(ABRecordRef)person
+{
+	ABPersonViewController* personController = [[[ABPersonViewController alloc] init] autorelease];
+	ContactsPicker* picker = (ContactsPicker*)peoplePicker;
+	
+	personController.displayedPerson = person;
+	personController.personViewDelegate = self;
+	personController.allowsEditing = picker.allowsEditing;
+	
+	if (picker.allowsEditing) {
+		[peoplePicker pushViewController:personController animated:YES];
+	} else {
+		OCABRecord* rec = [[OCABRecord alloc] initWithCFTypeRef:person];
+		NSString* jsString = [[NSString alloc] initWithFormat:@"%@(%@);", picker.jsCallback, [rec JSONValue]];
+		[webView stringByEvaluatingJavaScriptFromString:jsString];
+		
+		[jsString release];
+		[rec release];
+		[picker dismissModalViewControllerAnimated:YES];
+	}
+	return NO;
+}
+
+- (BOOL) peoplePickerNavigationController:(ABPeoplePickerNavigationController*)peoplePicker 
+	     shouldContinueAfterSelectingPerson:(ABRecordRef)person property:(ABPropertyID)property identifier:(ABMultiValueIdentifier)identifier
+{
+	return YES;
+}
+
+- (void) peoplePickerNavigationControllerDidCancel:(ABPeoplePickerNavigationController *)peoplePicker
+{
+	[peoplePicker dismissModalViewControllerAnimated:YES]; 
+}
+
+- (void) removeContact:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options
+{
+	NSUInteger argc = [arguments count];
+	ABRecordID recordID = kABRecordInvalidID;
+	NSString* jsCallback = nil;
+	
+	if (argc > 0) {
+		recordID = [[arguments objectAtIndex:0] intValue];
+	} else {
+		NSLog(@"Contacts.removeContact: Missing 1st parameter.");
+		return;
+	}
+	
+	if (argc > 1)
+		jsCallback = [arguments objectAtIndex:1];
+	
+	OCABRecord* rec = [OCABRecord CreateFromRecordID:recordID andAddressBook:addressBook];
+	NSString* firstParam = @"";
+	bool removeOk = false, saveOk = false;
+	CFErrorRef errorRef;
+	
+	if (rec) {
+		removeOk = [rec removeFrom:addressBook];
+		if (removeOk) {
+			saveOk = ABAddressBookSave(addressBook, &errorRef);
+		}
+		if (saveOk) {
+			[self addressBookDirty];
+			firstParam = [rec JSONValue];
+		}
+		[rec release];
+	}
+	
+	if (jsCallback) {
+		NSString* jsString = [[NSString alloc] initWithFormat:@"%@(%@);", jsCallback, firstParam];
+		[webView stringByEvaluatingJavaScriptFromString:jsString];
+		[jsString release];
+	}
 }
 
 - (void) addressBookDirty
@@ -198,7 +365,7 @@ void addressBookChanged(ABAddressBookRef addressBook, CFDictionaryRef info, void
 {
 	ABAddressBookUnregisterExternalChangeCallback(addressBook, addressBookChanged, self);
 
-	if (addressBook == nil) {
+	if (addressBook) {
 		CFRelease(addressBook);
 	}
 	
