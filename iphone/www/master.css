@@ -1,14 +1,9 @@
 body {
-  overflow: hidden;
-  font-family: sans-serif;
   background-color: black;
-  -webkit-perspective: 600;
+  color: #ffffff;
   -webkit-user-select: none;
   margin: 0px;
   padding: 0px;
-  color: #666666;
-  font-size: 72%;
-  line-height: 1.5em;
 }
 
 body > ul.PanelContainer {
@@ -19,40 +14,34 @@ body > ul.PanelContainer {
   height: 100%;
   margin: 0px;
   padding: 0px;
-  -webkit-transform-style: preserve-3d;
-  -webkit-transition-property: -webkit-transform;
-  -webkit-transition-duration: 1s;
-  -webkit-transition-delay: 0.25s;
 }
 
-body > ul.PanelContainer.flipped {
-  -webkit-transform: rotateY(180deg);
-}                       
 body > ul.PanelContainer > li {
   margin: 0px;
   padding: 0px;
   list-style: none;
-  -webkit-backface-visibility: hidden;
   background-color: #222222;
   position: absolute;
   top: 0px;
   left: 0px;
   width: inherit;
   height: inherit;
+  z-index: 1;
 }
 
-body > ul.PanelContainer > li.front {
-  -webkit-transform: rotateY(0deg);
+body > ul.PanelContainer.animated > li {
+  -webkit-backface-visibility: hidden;
+  -webkit-transition-property: -webkit-transform;
+  -webkit-transition-duration: 0.75s;
 }
-body > ul.PanelContainer > li.back {
-  -webkit-transform: rotateY(180deg);
-}
+
 body > ul.PanelContainer > li.hidden {
-  display: none;
+  -webkit-transform: translateY(460px);
+  z-index: 0;
 }
 
 body {
-  background:#222 none repeat scroll 0 0;
+  background:black;
   color:#666;
   font-family:Helvetica;
   font-size:72%;

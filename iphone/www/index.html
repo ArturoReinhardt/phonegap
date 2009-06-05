@@ -7,44 +7,9 @@
     <title>PhoneGap</title>
     <link rel="stylesheet" href="master.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+    <script type="text/javascript" charset="utf-8" src="master.js"></script>
+<!--
     <script type="text/javascript" charset="utf-8">
-
-      function openPanel(targetPanel) {
-        var container = document.querySelector('body > ul.PanelContainer');
-
-        if (typeof(targetPanel) == 'string')
-          targetPanel = document.querySelector(targetPanel);
-
-        var oldPanelClass = 'front';
-        var newPanelClass = 'back';
-        if (container.className.match(/flipped/)) {
-          oldPanelClass = 'back';
-          newPanelClass = 'front';
-        }
-
-        var currentPanel = document.querySelector('body > ul.PanelContainer > li.' + oldPanelClass);
-
-        // Hide other panels
-        var panels = document.querySelectorAll('body > ul.PanelContainer > li');
-        for (var i = 0; i < panels.length; i++) {
-          var panel = panels[i];
-          if (panel === currentPanel || panel === targetPanel)
-            continue;
-          panel.className = 'hidden';
-        }
-
-        container.addEventListener('webkitTransitionEnd', function() {
-            currentPanel.className = 'hidden';
-            container.removeEventListener('webkitTransitionEnd', this, false);
-            delete this;
-        }, false);
-
-        targetPanel.className = newPanelClass;
-        if (container.className.match(/flipped/))
-          container.className = 'PanelContainer';
-        else
-          container.className = 'PanelContainer flipped';
-      }
 
     function deviceInfo(){
       debug.log("deviceInfo");
@@ -243,37 +208,6 @@
     }
     
     function setupToolbars() {
-       tabbar.createTabBar();
-
-       var toprated = 0;
-       tabbar.createTabBarItem("toprated", "Top Rated", "tabButton:TopRated", {
-           onSelect: function() {
-               openPanel('#Page1');
-               tabbar.updateTabBarItem("toprated", { badge: ++toprated });
-           }
-       });
-
-       var recents = 0;
-       tabbar.createTabBarItem("recents", "Recents", null, {
-           onSelect: function() {
-               openPanel('#Page2');
-               tabbar.updateTabBarItem("recents", { badge: ++recents });
-           }
-       });
-
-       var history = 0;
-       tabbar.createTabBarItem("history", "History", "icon.png", {
-           onSelect: function() {
-               navigator.notification.alert("History selected");
-               tabbar.updateTabBarItem("history", { badge: ++history });
-           }
-       });
-
-       tabbar.createTabBarItem("search", "Search", "tabButton:Search");
-       tabbar.createTabBarItem("downloads", "Downloads", "tabButton:Downloads");
-
-       tabbar.showTabBar();
-       tabbar.showTabBarItems("toprated", "recents", "history");
     }
 
     function preventBehavior(e) { 
@@ -308,7 +242,7 @@
       document.addEventListener('alertClosed', function(e) { debug.log("Alert box closed when user clicked button " + e.buttonIndex + " having title " + e.buttonLabel); }, false);
       navigator.file.listDirectoryContents("www", {
         onComplete: function(result) {
-            /* Do something with the files */
+            // Do something with the files
         }
       });
       navigator.camera.getPicture(
@@ -325,12 +259,12 @@
           }
       );
     });
-    
     </script>
+-->
   </head>
   <body id="stage" class="theme">
-    <ul class="PanelContainer">
-      <li id="Page1" class="front">
+    <ul class="PanelContainer animated">
+      <li id="MainPanel" class="active">
   <!--
 	  <a href="javascript:addContact(true)">New Contact (GUI)</a>
 	  <br />
@@ -364,7 +298,7 @@
 	  <br />
 -->
         <h2>this file is located at iphone/www/index.html</h2>
-        <div id="info" class="Panel">
+        <div>
           <table>
             <tr>
               <td>
@@ -398,8 +332,18 @@
         <a href="#" class="btn" onclick="beep();">Beep</a>
         <a href="#" class="btn" onclick="vibrate();">Vibrate</a>
       </li>
-      <li id="Page2" class="hidden">
+      <li id="ContactsPanel" class="hidden">
+contacts
         <a href="#" class="btn large" onclick="getContact();">Get Fourth Contact</a>
+      </li>
+      <li id="AccelPanel" class="hidden">
+accel
+      </li>
+      <li id="LocationPanel" class="hidden">
+location
+      </li>
+      <li id="CameraPanel" class="hidden">
+camera
       </li>
     </ul>
   </body>
