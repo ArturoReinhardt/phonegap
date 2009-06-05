@@ -31,8 +31,9 @@ body > ul.PanelContainer > li {
 
 body > ul.PanelContainer.animated > li {
   -webkit-backface-visibility: hidden;
+  -webkit-transition-timing-function: ease-in-out;
   -webkit-transition-property: -webkit-transform;
-  -webkit-transition-duration: 0.75s;
+  -webkit-transition-duration: 0.5s;
 }
 
 body > ul.PanelContainer > li.hidden {
@@ -50,18 +51,18 @@ body {
   border-top:1px solid #393939;
 }
 
-#info{
+table {
   background:#ffa;
   border: 1px solid #ffd324;
   -webkit-border-radius: 5px;
   border-radius: 5px;
   clear:both;
   margin:15px 6px 0;
-  width:295px;
+  width:306px;
   padding:4px 0px 2px 10px;
 }
 
-#info h4{
+table  h4{
   font-size:.95em;
   margin:0;
   padding:0;
@@ -72,7 +73,7 @@ body {
 }
 
 /* Definition List */
-#Page1 > dl{
+#AccelPanel > dl{
 	padding-top:10px;
 	clear:both;
 	margin:0;
@@ -81,13 +82,13 @@ body {
 	overflow:auto;
 }
 
-#Page1 > dl > dt{
+#AccelPanel > dl > dt{
 	font-weight:bold;
 	float:left;
 	margin-left:5px;
 }
 
-#Page1 > dl > dd{
+#AccelPanel > dl > dd{
 	width:45px;
 	float:left;
 	color:#a87;
