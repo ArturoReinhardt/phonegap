@@ -22,7 +22,26 @@ function Demo() {
     tabbar.showTabBarItems("main", "accelerometer", "contacts", "geolocation");
     tabbar.selectTabBarItem("main");
 
-    navigationbar.setNavBar("PhoneGap Demo");
+    navigationbar.setNavBar("PhoneGap Demo", 'toolButton:Camera', {
+        onButton: function() {
+            var source = 'camera';
+            if (navigator.device.platform.match(/Simulator/))
+                source = 'library'; // the simulator's camera doesn't work
+
+            navigator.camera.getPicture(
+                function() {
+                    var cameraPanel = document.getElementById('CameraPanel');
+                    cameraPanel.innerHTML = '<img src="../phonegap_photo.png" width="300" align="center"/>';
+                    app.openPanel(cameraPanel);
+                    tabbar.selectTabBarItem(null);
+                },
+                function(msg) {
+                    navigator.notification.alert('Error taking picture\n' + msg, 'Camera');
+                },
+                { source: source, destination: 'file:///phonegap_photo.png' }
+            );
+        }
+    });
 
     try {
         this.populateDeviceInfo();
