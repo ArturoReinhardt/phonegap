@@ -1,213 +1,176 @@
-function deviceInfo(){
-  debug.log("deviceInfo");
-  document.getElementById("platform").innerHTML   = device.platform;
-  document.getElementById("version").innerHTML    = device.version;
-  document.getElementById("devicename").innerHTML = device.name;
-  document.getElementById("uuid").innerHTML       = device.uuid;
+function Demo() {
+    var dis = this;
+    tabbar.createTabBar();
+
+    tabbar.createTabBarItem("main", "Main", null, {
+        onSelect: function() { dis.selectMainTab(); }
+    });
+
+    tabbar.createTabBarItem("contacts", "Contacts", null, {
+        onSelect: function() { dis.selectContactsTab(); }
+    });
+
+    tabbar.createTabBarItem("accelerometer", "Accelerometer", null, {
+        onSelect: function() { dis.selectAccelTab(); }
+    });
+
+    tabbar.createTabBarItem("geolocation", "Geolocation", null, {
+        onSelect: function() { dis.selectLocationTab(); }
+    });
+
+    tabbar.showTabBar();
+    tabbar.showTabBarItems("main", "accelerometer", "contacts", "geolocation");
+    tabbar.selectTabBarItem("main");
+
+    navigationbar.setNavBar("PhoneGap Demo", 'toolButton:Camera', {
+        onButton: function() {
+            var source = 'camera';
+            if (navigator.device.platform.match(/Simulator/))
+                source = 'library'; // the simulator's camera doesn't work
+
+            navigator.camera.getPicture(
+                function() {
+                    var cameraPanel = document.getElementById('CameraPanel');
+                    cameraPanel.innerHTML = '<img src="../phonegap_photo.png" width="300" align="center"/>';
+                    app.openPanel(cameraPanel);
+                    tabbar.selectTabBarItem(null);
+                },
+                function(msg) {
+                    navigator.notification.alert('Error taking picture\n' + msg, 'Camera');
+                },
+                { source: source, destination: 'file:///phonegap_photo.png' }
+            );
+        }
+    });
+
+    try {
+        this.populateDeviceInfo();
+    } catch(e) {
+        debug.error(e);
+    }
 }
 
-function getLocation() {
-  debug.log("getLocation");
-  navigator.notification.activityStart();
-  var suc = function(p){
-    debug.log(p.latitude + " " + p.longitude);
-    navigator.notification.alert(p.latitude + " " + p.longitude, "Your GeoLocation", "Thanks");
-    navigator.notification.activityStop();
-  };
-  var fail = function(){};
-  navigator.geolocation.getCurrentPosition(suc,fail);
-}
+Demo.prototype = {
+    selectMainTab: function() {
+        this.openPanel(document.getElementById('MainPanel'));
+    },
+    selectContactsTab: function() {
+        this.openPanel(document.getElementById('ContactsPanel'));
+    },
+    selectAccelTab: function() {
+        this.openPanel(document.getElementById('AccelPanel'));
+    },
+    selectLocationTab: function() {
+        this.openPanel(document.getElementById('LocationPanel'));
+    },
 
-function customAlert(){
-  navigator.notification.alert("Custom alert", "Custom title", "Yup!", "Nope", { onClose: function(index, label) { debug.log("alert's onClick callback called on button " + index + " (" + label + ")") } });
-}
+    populateDeviceInfo: function() {
+      debug.log("deviceInfo");
+      document.getElementById("platform").innerHTML   = device.platform;
+      document.getElementById("version").innerHTML    = device.version;
+      document.getElementById("devicename").innerHTML = device.name;
+      document.getElementById("uuid").innerHTML       = device.uuid;
+    },
 
-function beep(){
-  debug.log("beep");
-  navigator.notification.beep(2);
-}
+    addContact: function(gui) {
+        var sample_contact = { 'firstName': 'John', 'lastName' : 'Smith', 'phoneNumber': '555-5555' };
 
-function vibrate(){
-  debug.log("vibrate");
-  navigator.notification.vibrate(0);
-}
-
-function getContactsPrompt(){
-  debug.log("getContactsPrompt");
-      
-            var pageSize = prompt("Page size", 10);
-            if (pageSize) {
-                    var pageNumber = prompt("Page number", 1);
-                    if (pageNumber) {
-                            getContacts(parseInt(pageSize), parseInt(pageNumber));
+        if (gui) {
+            navigator.ContactManager.newContact(sample_contact, null, { 'gui': true });
+        } else {
+            var firstName = prompt("Enter a first name", sample_contact.firstName);
+            if (firstName) {
+                var lastName = prompt("Enter a last name", sample_contact.lastName);
+                if (lastName) {
+                    var phoneNumber = prompt("Enter a phone number", sample_contact.phoneNumber);
+                    if (phoneNumber) {
+                        sample_contact = { 'firstName': firstName, 'lastName' : lastName, 'phoneNumber' : phoneNumber };
+                        navigator.ContactManager.newContact(sample_contact, chooseContact_Return);
                     }
+                }
             }
-}
+        }
+    },
 
-function getContacts(pageSize, pageNumber){
-  debug.log("getContacts");
-  var fail = function(){};
-      var options = null;
-      
-      if (pageSize && pageNumber)
-            options = { 'pageSize': pageSize, 'pageNumber': pageNumber };
-      
-  navigator.ContactManager.allContacts(getContacts_Return, fail, options);
-}
-    
-    function getContacts_Return(contactsArray)
-    {
-            var names = "";
-            
-            for (var i = 0; i < contactsArray.length; i++) {
-                    var con = new Contact();
-                    con.firstName = contactsArray[i].firstName;
-                    con.lastName = contactsArray[i].lastName;
-                    con.phoneNumber = contactsArray[i].phoneNumber;
-                    con.address = contactsArray[i].address;	
-                    names += con.displayName();
-                    
-                    if (i+1 != contactsArray.length)
-                            names += ",";
-            }
-            
-            alert(names);
-    }
-    
-    function contactsCount(){
-  debug.log("contactCount");
-  navigator.ContactManager.contactsCount(showContactsCount);
-}
-    
-    function showContactsCount(count){
-            alert("Number of contacts: " + count);
-    }
+    getLocation: function() {
+        debug.log("getLocation");
+        navigator.geolocation.watchPosition(function(p) {
+              document.getElementById("geo_lat").innerHTML = p.coords.latitude;
+              document.getElementById("geo_long").innerHTML = p.coords.longitude;
+              document.getElementById("geo_alt").innerHTML = p.coords.alt;
+              document.getElementById("geo_course").innerHTML = p.coords.heading;
+              document.getElementById("geo_speed").innerHTML = p.coords.speed;
+              document.getElementById("geo_x_acc").innerHTML = p.coords.accuracy.horizontal;
+              document.getElementById("geo_y_acc").innerHTML = p.coords.accuracy.vertical;
+        }, false);
 
-    function addContact(gui){
-            var sample_contact = { 'firstName': 'John', 'lastName' : 'Smith' };
-    
-            if (gui) {
-                    navigator.ContactManager.newContact(sample_contact, null, { 'gui': true });
-            } else {
-                    var firstName = prompt("Enter a first name", sample_contact.firstName);
-                    if (firstName) {
-                            var lastName = prompt("Enter a last name", sample_contact.lastName);
-                            if (lastName) {
-                                    sample_contact = { 'firstName': firstName, 'lastName' : lastName };
-                                    navigator.ContactManager.newContact(sample_contact);
-                            }
-                    }
-            }
-    }
+        navigator.notification.activityStart();
+        var suc = function(p){
+            debug.log(p);
+            navigator.notification.alert(p.coords.latitude + " " + p.coords.longitude, "Your GeoLocation", "Thanks");
+            navigator.notification.activityStop();
+        };
+        var fail = function(error){
+	};
+        navigator.geolocation.getCurrentPosition(suc,fail);
+    },
 
-function watchAccel() {
-  debug.log("watchAccel");
-  var suc = function(a){
-    document.getElementById('x').innerHTML = roundNumber(a.x);
-    document.getElementById('y').innerHTML = roundNumber(a.y);
-    document.getElementById('z').innerHTML = roundNumber(a.z);
-  };
-  var fail = function(){};
-  var opt = {};
-  opt.frequency = 100;
-  timer = navigator.accelerometer.watchAcceleration(suc,fail,opt);
-}
+    customAlert: function() {
+      navigator.notification.alert("Custom alert", "Custom title", "Yup!", "Nope", { onClose: function(index, label) { debug.log("alert's onClick callback called on button " + index + " (" + label + ")") } });
+    },
   
-function roundNumber(num) {
-  var dec = 3;
-  var result = Math.round(num*Math.pow(10,dec))/Math.pow(10,dec);
-  return result;
-}
+    beep: function() {
+      debug.log("beep");
+      navigator.notification.beep(2);
+    },
+  
+    vibrate: function() {
+      debug.log("vibrate");
+      navigator.notification.vibrate(0);
+    },
 
-function setupToolbars() {
-   tabbar.createTabBar();
+    openPanel: function(targetPanel) {
+        var container = document.querySelector('body > ul.PanelContainer');
+        if (!container || !targetPanel) return;
 
-   var toprated = 0;
-   tabbar.createTabBarItem("toprated", "Top Rated", "tabButton:TopRated", {
-       onSelect: function() {
-           navigator.notification.alert("Top Rated selected");
-           tabbar.updateTabBarItem("toprated", { badge: ++toprated });
-       }
-   });
+        if (!container.panelListenerAdded) {
+            // add an event listener to clean up the other panels after the animation
+            container.addEventListener('webkitTransitionEnd', (function(){ 
+                return function() {
+                    var panels = document.querySelectorAll('body > ul.PanelContainer > li');
+                    for (var i = 0; i < panels.length; i++) {
+                        var panel = panels[i];
+                        // only hide the inactive panels
+                        if (panel.className.match(/active/))
+                            continue;
+                        panel.className = 'hidden';
+                    }
+                };
+            })(), false);
+            container.panelListenerAdded = true;
+        }
 
-   var recents = 0;
-   tabbar.createTabBarItem("recents", "Recents", null, {
-       onSelect: function() {
-           navigator.notification.alert("Recents selected");
-           tabbar.updateTabBarItem("recents", { badge: ++recents });
-       }
-   });
+        var currentPanel = document.querySelector('body > ul.PanelContainer > li.active');
+        if (targetPanel === currentPanel)
+            return;
 
-   var history = 0;
-   tabbar.createTabBarItem("history", "History", "icon.png", {
-       onSelect: function() {
-           navigator.notification.alert("History selected");
-           tabbar.updateTabBarItem("history", { badge: ++history });
-       }
-   });
+        container.className       = 'PanelContainer'; // disable animation
+        currentPanel.className    = '';  // deactivate current panel
+        currentPanel.style.zIndex = 0;
+        setTimeout(function() {
+            container.className = 'PanelContainer animated'; // reenable animation
+            targetPanel.style.zIndex = 1;      // slide new panel into view
+            targetPanel.className = 'active';
+        }, 0);
+    },
 
-   tabbar.createTabBarItem("search", "Search", "tabButton:Search");
-   tabbar.createTabBarItem("downloads", "Downloads", "tabButton:Downloads");
-
-   tabbar.showTabBar();
-   tabbar.showTabBarItems("toprated", "recents", "history");
-}
+};
 
 function preventBehavior(e) { 
-  e.preventDefault(); 
+    e.preventDefault(); 
 };
 
 PhoneGap.addConstructor(function(){
   document.addEventListener("touchmove", preventBehavior, false);
-  setupToolbars();
-  navigationbar.setNavBar('My Title', 'Go Right', {
-    onButton: function() {
-      navigationbar.setNavBar('Another title', 'toolButton:Trash', {
-        onShowStart: function() {
-          debug.log("New navbar item starting to show");
-        },
-        onShow: function() {
-          debug.log("New navbar item shown");
-        },
-        onHideStart: function() {
-          debug.log("New navbar item starting to go away");
-        },
-        onHide: function() {
-          debug.log("New navbar item has gone away");
-        }
-      });
-    }
-  });
-
-  deviceInfo();
-  document.addEventListener('startOrientationChange', function(e) { debug.log("Orientation changing to " + e.orientation); }, false);
-  document.addEventListener('stopOrientationChange', function(e) { debug.log("Orientation changed from " + e.orientation); }, false);
-  document.addEventListener('alertClosed', function(e) { debug.log("Alert box closed when user clicked button " + e.buttonIndex + " having title " + e.buttonLabel); }, false);
-  /*
-  dialog.openButtonDialog(
-      'This is my title',
-      'Foo',
-      { label: 'Bar' },
-      { label: 'Baz', type: 'destroy', onClick: function() { debug.log("Destroy called") }},
-      { style: 'translucent' }
-  );
-  navigator.file.listDirectoryContents("www", {
-    onComplete: function(result) {
-        /* Do something with the files */
-    }
-  });
-  navigator.camera.getPicture(
-      function(url) {
-            debug.log("Saved picture: " + url);
-      },
-      function(status) {
-            debug.log("Error saving picture: " + status);
-      },
-      {
-            source: 'library',
-            destination: 'file:///image.jpg',
-            jpegQuality: 1.0
-      }
-  );
-  */
+  window.app = new Demo();
 });

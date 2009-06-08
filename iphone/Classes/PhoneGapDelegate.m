@@ -17,7 +17,7 @@
     if (self != nil) {
         commandObjects = [[NSMutableDictionary alloc] initWithCapacity:4];
     }
-    return self;
+    return self; 
 }
 
 /**
@@ -37,6 +37,7 @@
             obj = [[NSClassFromString(className) alloc] initWithWebView:webView];
         
         [commandObjects setObject:obj forKey:className];
+		[obj release];
     }
     return obj;
 }
@@ -58,7 +59,7 @@
      * class name under which our app is running, since the build-phonegap.sh script renames
      * the main classes to our application's name at build time.
      */
-    jsAppName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
+    jsAppName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
 
 	/*
 	 * PhoneGap.plist
@@ -107,10 +108,14 @@
 	 * imageView - is the Default loading screen, it stay up until the app and UIWebView (WebKit) has completly loaded.
 	 * You can change this image by swapping out the Default.png file within the resource folder.
 	 */
-	imageView = [[UIImageView alloc] initWithImage:[[UIImage alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Default" ofType:@"png"]]];
+	UIImage* image = [[UIImage alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Default" ofType:@"png"]];
+	imageView = [[UIImageView alloc] initWithImage:image];
+	[image release];
+	
     imageView.tag = 1;
 	[window addSubview:imageView];
-  
+	[imageView release];
+	
     /*
      * autoRotate - If you want your phone to automatically rotate its display when the phone is rotated
      * Value should be BOOL (YES|NO)
@@ -186,6 +191,7 @@
 
     NSLog(@"Device initialization: %@", result);
     [theWebView stringByEvaluatingJavaScriptFromString:result];
+	[result release];
 }
 
 /**
@@ -352,11 +358,6 @@
 
 - (void)dealloc
 {
-    NSArray *objects = [commandObjects allValues];
-    int i, count = [objects count];
-    for (i = 0; i < count; i++) {
-        [[objects objectAtIndex:i] release];
-    }
     [commandObjects release];
 	[imageView release];
 	[viewController release];

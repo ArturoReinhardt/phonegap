@@ -7,6 +7,7 @@
 //
 
 #import "Notification.h"
+#import "Categories.h"
 
 @implementation Notification
 
@@ -80,12 +81,14 @@
 
 - (void)activityStart:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options
 {
+    NSLog(@"Activity starting");
     UIApplication* app = [UIApplication sharedApplication];
     app.networkActivityIndicatorVisible = YES;
 }
 
 - (void)activityStop:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options
 {
+    NSLog(@"Activitiy stopping ");
     UIApplication* app = [UIApplication sharedApplication];
     app.networkActivityIndicatorVisible = NO;
 }
@@ -93,6 +96,43 @@
 - (void)vibrate:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options
 {
 	AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+}
+
+- (void)loadingStart:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options
+{
+	if (loadingView == nil) 
+	{
+		NSLog(@"Loading start");
+		UIViewController* c = [super appViewController];
+		loadingView = [LoadingView loadingViewInView:c.view];
+
+		NSRange minMaxDuration = NSMakeRange(2, 3600);// 1 hour max? :)
+		NSString* durationKey = @"duration";
+		// the view will be shown for a minimum of this value if durationKey is not set
+		loadingView.minDuration = [options integerValueForKey:@"minDuration" defaultValue:minMaxDuration.location withRange:minMaxDuration];
+		
+		// if there's a duration set, we set a timer to close the view
+		if ([options valueForKey:durationKey]) {
+			NSTimeInterval duration = [options integerValueForKey:durationKey defaultValue:minMaxDuration.location withRange:minMaxDuration];
+			[self performSelector:@selector(loadingStop:withDict:) withObject:nil afterDelay:duration];
+		}
+	}
+}
+
+- (void)loadingStop:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options
+{
+	if (loadingView != nil) 
+	{
+		NSLog(@"Loading stop");
+		NSTimeInterval diff = [[NSDate date] timeIntervalSinceDate:loadingView.timestamp] - loadingView.minDuration;
+		
+		if (diff >= 0) {
+			[loadingView removeView]; // the superview will release (see removeView doc), so no worries for below
+			loadingView = nil;
+		} else {
+			[self performSelector:@selector(loadingStop:withDict:) withObject:nil afterDelay:-1*diff];
+		}
+	}
 }
 
 @end
