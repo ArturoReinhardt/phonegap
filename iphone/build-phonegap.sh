@@ -1,7 +1,7 @@
 #!/bin/sh
 set -x
 PHONEGAP_LIB=$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/www/app.js
-APPNAME=`defaults read $SOURCE_ROOT/Info CFBundleDisplayName | sed -Ee 's/[^a-zA-Z0-9]+//'`
+APPNAME=`defaults read $SOURCE_ROOT/Info CFBundleName`
 
 cd $PROJECT_DIR/..
 [ -f Makefile ] && rm Makefile
