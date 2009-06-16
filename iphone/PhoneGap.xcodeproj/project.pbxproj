@@ -43,6 +43,7 @@
 		BB8FC69F0F5BB58D007C7DCE /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8FC69E0F5BB58D007C7DCE /* CFNetwork.framework */; };
 		BB8FCC5E0F5F00FF007C7DCE /* Map.m in Sources */ = {isa = PBXBuildFile; fileRef = BB8FCC5D0F5F00FF007C7DCE /* Map.m */; };
 		BB8FCE250F5F2CF3007C7DCE /* Location.m in Sources */ = {isa = PBXBuildFile; fileRef = 8254F8800E650500002FDA36 /* Location.m */; };
+		ED87DE450FE84ECC007D78D1 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED87DE440FE84ECC007D78D1 /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -103,6 +104,7 @@
 		BB8FC69E0F5BB58D007C7DCE /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		BB8FCC5C0F5F00FF007C7DCE /* Map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Map.h; sourceTree = "<group>"; };
 		BB8FCC5D0F5F00FF007C7DCE /* Map.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Map.m; sourceTree = "<group>"; };
+		ED87DE440FE84ECC007D78D1 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +121,7 @@
 				BB8FC69F0F5BB58D007C7DCE /* CFNetwork.framework in Frameworks */,
 				30EC9B110FCDFC9900A52C71 /* CoreGraphics.framework in Frameworks */,
 				30EC9B220FCDFCC500A52C71 /* QuartzCore.framework in Frameworks */,
+				ED87DE450FE84ECC007D78D1 /* AVFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -217,6 +220,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				ED87DE440FE84ECC007D78D1 /* AVFoundation.framework */,
 				30EC9B210FCDFCC500A52C71 /* QuartzCore.framework */,
 				30EC9B100FCDFC9900A52C71 /* CoreGraphics.framework */,
 				079B0A090E45734600755F37 /* CoreLocation.framework */,

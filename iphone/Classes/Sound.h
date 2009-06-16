@@ -8,10 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioServices.h>
+#import <AVFoundation/AVFoundation.h>
 #import "PhoneGapCommand.h"
 
 @interface Sound : PhoneGapCommand <AVAudioPlayerDelegate> {
-		AVAudioPlayer *player;
+	AVAudioPlayer *player;
 }
 
 - (void) play:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
