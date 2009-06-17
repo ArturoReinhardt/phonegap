@@ -28,7 +28,7 @@ PhoneGap.available = DeviceInfo.uuid != undefined;
  */
 PhoneGap.addConstructor = function(func) {
     var state = document.readyState;
-    if (state != 'loaded' && state != 'complete')
+    if ("DeviceInfo" in window && (state == 'loaded' || state == 'complete'))
         PhoneGap._constructors.push(func);
     else
         func();
@@ -36,7 +36,7 @@ PhoneGap.addConstructor = function(func) {
 (function() {
     var timer = setInterval(function() {
         var state = document.readyState;
-        if (state != 'loaded' && state != 'complete')
+        if (!"DeviceInfo" in window && state != 'loaded' && state != 'complete')
             return;
         clearInterval(timer);
         while (PhoneGap._constructors.length > 0) {

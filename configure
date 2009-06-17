@@ -44,6 +44,9 @@ IPHONE_DOCSET_TMPDIR = docs/iphone/tmp
 
 all :: $PLATFORMS
 
+Makefile: configure javascripts/.exclude
+	./configure
+
 clean :: clean_docs clean_libs
 
 clean_docs:
@@ -91,15 +94,12 @@ lib/$platform/phonegap-min.js: lib/$platform/phonegap.js
 	\$(JAVA) -jar util/yuicompressor-2.4.2.jar --charset UTF-8 -o \$@ lib/$platform/phonegap.js
 
 EOF
-	platform_srcs=`echo javascripts/phonegap.js.base javascripts/*.js javascripts/$platform/*.js`
-        if [ $(find javascripts/app -name *.js | wc -l 2>/dev/null) != "0" ]; then
-            platform_srcs="$platform_srcs javascripts/app/*.js";
-        fi
-	echo lib/$platform/phonegap.js: $platform_srcs >> Makefile
+	platform_srcs=`ls -1 javascripts/*.js  javascripts/$platform/*.js javascripts/app/*.js | grep -v -f javascripts/.exclude`
+	echo lib/$platform/phonegap.js: Makefile javascripts/phonegap.js.base $platform_srcs >> Makefile
 	echo "	\$(RM_RF) lib/$platform" >> Makefile
 	echo "	\$(MKPATH) lib/$platform" >> Makefile
 	echo "	\$(RM_F) \$@" >> Makefile
-	for file in $( echo $platform_srcs ); do
+	for file in $( echo javascripts/phonegap.js.base $platform_srcs ); do
 		echo "	\$(CAT) $file >> \$@" >> Makefile
 	done
 done
