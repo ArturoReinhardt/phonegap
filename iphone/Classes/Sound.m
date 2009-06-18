@@ -41,11 +41,9 @@
 			[ player play ];
 		}
         return;
-    
-    // TODO Create a system facilitating handling callback responses in JavaScript easily, and no
-    // longer in an ad-hoc fashion.  Getting error results of whether or not the sound played, or
-    // other errors occurring in the system is important.
+    }
     SystemSoundID soundID;
+    NSURL *fileURL = [NSURL fileURLWithPath:filePath];
     OSStatus error = AudioServicesCreateSystemSoundID((CFURLRef)fileURL, &soundID);
     if (error != 0)
         NSLog(@"Sound error %d", error);
