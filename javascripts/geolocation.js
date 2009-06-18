@@ -46,11 +46,11 @@ Geolocation.prototype.getCurrentPosition = function(successCallback, errorCallba
         delay += interval;
 
         if (typeof(dis.lastPosition) == 'object' && dis.lastPosition.timestamp > referenceTime) {
+            clearInterval(timer);
             successCallback(dis.lastPosition);
-            clearInterval(timer);
         } else if (delay >= timeout) {
-            errorCallback();
             clearInterval(timer);
+            errorCallback();
         }
     }, interval);
 };
