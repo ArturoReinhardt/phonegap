@@ -15,6 +15,8 @@
     self = [super init];
     if (self != nil) {
         commandObjects = [[NSMutableDictionary alloc] initWithCapacity:4];
+	NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+        [cookieStorage setCookieAcceptPolicy:NSHTTPCookieAcceptPolicyAlways];
     }
     return self; 
 }
