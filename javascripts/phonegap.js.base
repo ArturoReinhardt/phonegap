@@ -12,6 +12,7 @@ PhoneGap = {
         commands: [],
         timer: null
     },
+    loaded: false,
     callbacks: [],
     _constructors: []
 };
@@ -28,10 +29,10 @@ PhoneGap.available = DeviceInfo.uuid != undefined;
  */
 PhoneGap.addConstructor = function(func) {
     var state = document.readyState;
-    if ("DeviceInfo" in window && (state == 'loaded' || state == 'complete'))
-        PhoneGap._constructors.push(func);
-    else
+    if (PhoneGap.loaded)
         func();
+    else
+        PhoneGap._constructors.push(func);
 };
 (function() {
     var timer = setInterval(function() {
@@ -39,6 +40,7 @@ PhoneGap.addConstructor = function(func) {
         if (!"DeviceInfo" in window && state != 'loaded' && state != 'complete')
             return;
         clearInterval(timer);
+        PhoneGap.loaded = true;
         while (PhoneGap._constructors.length > 0) {
             var constructor = PhoneGap._constructors.shift();
             try {
