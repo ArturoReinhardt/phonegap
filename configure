@@ -96,7 +96,9 @@ lib/$platform/phonegap-min.js: lib/$platform/phonegap.js
 EOF
 	platform_srcs='';
         for filename in `ls -1 javascripts/$platform/*.js | xargs basename`; do
-            `grep -q -v $filename javascripts/.exclude` || continue
+            if [ -s javascripts/.exclude ]; then
+                `grep -q -v $filename javascripts/.exclude` || continue
+            fi
             if [ -f javascripts/$platform/$filename ] && [ -f javascripts/$filename ]; then
                 platform_srcs="$platform_srcs javascripts/$filename javascripts/$platform/$filename";
             fi
