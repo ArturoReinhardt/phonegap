@@ -25,6 +25,7 @@
                                          inDirectory:directoryStr];
 	if (filePath == nil) {
 		NSLog(@"Can't find filename %@ in the app bundle", [arguments objectAtIndex:0]);
+#ifdef __IPHONE_3_0
 		if ([[arguments objectAtIndex:0] hasPrefix:@"http"]){
 	
 			if (player != nil)
@@ -40,6 +41,7 @@
 			[ player prepareToPlay ];
 			[ player play ];
 		}
+#endif
         return;
     }
     SystemSoundID soundID;
