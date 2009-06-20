@@ -9,6 +9,7 @@
 @synthesize activityView;
 @synthesize commandObjects;
 @synthesize settings;
+@synthesize jsAppName;
 
 - (id) init
 {
@@ -43,11 +44,25 @@
     return obj;
 }
 
+-(BOOL) hasCommandInstance:(NSString*)className
+{
+    if ([commandObjects objectForKey:className])
+        return YES;
+    else
+        return NO;
+}
+
 /**
  * This is main kick off after the app inits, the views and Settings are setup here.
  */
 - (void)applicationDidFinishLaunching:(UIApplication *)application
 {	
+    /* Load what our app name is called from the Info.plist bundle.  This is used as the main
+     * class name under which our app is running, since the build-phonegap.sh script renames
+     * the main classes to our application's name at build time.
+     */
+    jsAppName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+
 	/*
 	 * PhoneGap.plist
 	 *
@@ -281,7 +296,7 @@
         //NSLog(@"Options: %@", options);
         
 		// Tell the JS code that we've gotten this command, and we're ready for another
-        [theWebView stringByEvaluatingJavaScriptFromString:@"PhoneGap.queue.ready = true;"];
+        [theWebView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@.queue.ready = true;", self.jsAppName]];
 		
 		// Check to see if we are provided a class:method style command.
         NSArray* components = [command componentsSeparatedByString:@"."];

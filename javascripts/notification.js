@@ -3,7 +3,6 @@
  * @constructor
  */
 function Notification() {
-	
 }
 
 /**
@@ -39,7 +38,6 @@ Notification.prototype.activityStop = function() {
  * @param {String} colour The colour of the light.
  */
 Notification.prototype.blink = function(count, colour) {
-	
 };
 
 /**
@@ -47,7 +45,6 @@ Notification.prototype.blink = function(count, colour) {
  * @param {Integer} mills The number of milliseconds to vibrate for.
  */
 Notification.prototype.vibrate = function(mills) {
-	
 };
 
 /**
@@ -56,7 +53,22 @@ Notification.prototype.vibrate = function(mills) {
  * @param {Integer} volume The volume of the beep.
  */
 Notification.prototype.beep = function(count, volume) {
-	
+};
+
+/**
+ * Starts a loading indicator
+ * @param {Object} options Options to supply to the indicator
+ *      - \c minDuration {Integer} minimum duration, in seconds, the indicator can spin for
+ *      - \c duration {Integer} stop the loading indicator after this number of seconds
+ */
+Notification.prototype.loadingStart = function(options) {
+};
+
+/**
+ * Stops the loading indicator
+ */
+Notification.prototype.loadingStop = function() {
+    PhoneGap.exec("Notification.loadingStop");
 };
 
 // TODO: of course on Blackberry and Android there notifications in the UI as well

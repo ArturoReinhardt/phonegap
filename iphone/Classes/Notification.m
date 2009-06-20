@@ -59,6 +59,12 @@
 	[openURLAlert show];
 }
 
+/**
+ Callback invoked when an alert dialog's buttons are clicked.  This subsequently dispatches an event
+ call to the JavaScript environment indicating which button was pressed.
+ @brief callback when an alert button is clicked
+ @see alert:arguments:withDict
+ */
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     NSString *buttonLabel = [alertView buttonTitleAtIndex:buttonIndex];
@@ -107,11 +113,11 @@
 		loadingView = [LoadingView loadingViewInView:c.view];
 
 		NSRange minMaxDuration = NSMakeRange(2, 3600);// 1 hour max? :)
-		NSString* durationKey = @"duration";
 		// the view will be shown for a minimum of this value if durationKey is not set
 		loadingView.minDuration = [options integerValueForKey:@"minDuration" defaultValue:minMaxDuration.location withRange:minMaxDuration];
 		
 		// if there's a duration set, we set a timer to close the view
+		NSString* durationKey = @"duration";
 		if ([options valueForKey:durationKey]) {
 			NSTimeInterval duration = [options integerValueForKey:durationKey defaultValue:minMaxDuration.location withRange:minMaxDuration];
 			[self performSelector:@selector(loadingStop:withDict:) withObject:nil afterDelay:duration];

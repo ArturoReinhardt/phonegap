@@ -10,10 +10,11 @@ Get Started
 -------------------------------------------------------------
 Download the source.
 
-    git clone git://github.com/sintaxi/phonegap.git
+    git clone git://github.com/phonegap/phonegap.git
     
-PhoneGap project is separated into a native project for each 
-device, javascript files and a rakefile.
+The PhoneGap project is separated into a native project for each 
+device type, javascript files and a configure script that generates
+a Makefile.
 
     phonegap
       |- README.md
@@ -27,6 +28,16 @@ Each project has a respective README.md file. view that file
 for detailed information on how to work with that device. PhoneGap 
 offers one unified API for accessing core functionality on all 
 devices. Where possible, phonegap follows the **HTML5 spec**.
+
+When developing for your application, place your apps JavaScript
+source files in the javascripts/app directory, and then run:
+
+     ./configure && make
+
+This will build a custom JavaScript source file unique to each
+device type, with your apps JavaScript merged and minified.  This
+simplifies development, and ensures all your dependancies are loaded
+without needing to reference separate files.
 
 
 API
