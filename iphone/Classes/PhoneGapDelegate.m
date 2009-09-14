@@ -35,10 +35,10 @@
         NSDictionary* classSettings;
         classSettings = [settings objectForKey:className];
 
-        if (classSettings)
-            obj = [[NSClassFromString(className) alloc] initWithWebView:webView settings:classSettings];
-        else
-            obj = [[NSClassFromString(className) alloc] initWithWebView:webView];
+        if (classSettings == nil)
+            classSettings = [NSDictionary dictionary];
+
+        obj = [[NSClassFromString(className) alloc] initWithWebView:webView settings:classSettings];
         
         [commandObjects setObject:obj forKey:className];
 		[obj release];
