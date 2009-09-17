@@ -20,11 +20,16 @@
     <AVAudioPlayerDelegate>
 #endif
 {
+	NSString *successCallback;
+	NSString *errorCallback;
 
 #ifdef __IPHONE_3_0
 	AVAudioPlayer *player;
 #endif
 }
+
+@property (retain) NSString* successCallback;
+@property (retain) NSString* errorCallback;
 
 - (void) play:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
 

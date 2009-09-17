@@ -1,11 +1,12 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 #import <UIKit/UINavigationController.h>
-#import <JSON/JSON.h>
+#import "JSON.h"
 
 #import "Location.h"
 #import "Device.h"
 
+@class InvokedUrlCommand;
 @class PhoneGapViewController;
 
 @interface PhoneGapDelegate : NSObject <
@@ -41,8 +42,12 @@
 @property (nonatomic, retain) NSString *jsAppName;
 @property (nonatomic, retain) NSURL *invokedURL;
 
--(id) getCommandInstance:(NSString*)className;
--(BOOL) hasCommandInstance:(NSString*)className;
+- (id) getCommandInstance:(NSString*)className;
+- (BOOL) hasCommandInstance:(NSString*)className;
+- (void) javascriptAlert:(NSString*)text;
+- (BOOL) execute:(InvokedUrlCommand*)command;
+- (NSString*) appURLScheme;
+
 + (NSDictionary*)getBundlePlist:(NSString *)plistName;
 
 @end
