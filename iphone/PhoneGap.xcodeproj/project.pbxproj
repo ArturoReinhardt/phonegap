@@ -295,7 +295,6 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				ED87DE440FE84ECC007D78D1 /* AVFoundation.framework */,
 				30C5319F1020E4310017260B /* SystemConfiguration.framework */,
 				30EC9B210FCDFCC500A52C71 /* QuartzCore.framework */,
 				30EC9B100FCDFC9900A52C71 /* CoreGraphics.framework */,

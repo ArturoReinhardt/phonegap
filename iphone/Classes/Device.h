@@ -14,5 +14,6 @@
 }
 
 - (NSDictionary*) deviceProperties;
+- (void) hideSplashScreen:(NSMutableArray*) arguments withDict:(NSMutableDictionary*) options;
 
 @end

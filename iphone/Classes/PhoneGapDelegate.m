@@ -294,7 +294,13 @@
 	[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 	activityView.hidden = YES;	
 
-	imageView.hidden = YES;
+	/*
+	 * Only hide the startup splash screen if the AutoHideSplashScreen option in the PhoneGap.plist
+	 * file is set to true.  Setting this to false lets a developer hide the splash screen from
+	 * JavaScript when their application is ready.
+	 */
+	if ([[settings objectForKey:@"AutoHideSplashScreen"] boolValue])
+		imageView.hidden = YES;
 	
 	[window bringSubviewToFront:viewController.view];
 	webView = theWebView; 	

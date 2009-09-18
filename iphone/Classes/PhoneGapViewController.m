@@ -50,7 +50,11 @@
  */
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
-    NSString *jsCallback = [NSString stringWithFormat:@"(function(){ var e = document.createEvent('Events'); e.initEvent('stopOrientationChange', 'false', 'false'); e.orientation = %f; document.dispatchEvent(e); })()",
+    NSString *jsCallback = [NSString stringWithFormat:@"(function(){ "
+									"var e = document.createEvent('Events'); "
+									"e.initEvent('stopOrientationChange', 'false', 'false'); "
+									"e.orientation = %f; "
+									"document.dispatchEvent(e); })()",
                                 [self getRotationInDegrees:fromInterfaceOrientation]
                             ];
 	[webView stringByEvaluatingJavaScriptFromString:jsCallback];

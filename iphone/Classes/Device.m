@@ -32,4 +32,14 @@
     return devReturn;
 }
 
+
+/**
+ * Hides the splash screen explicitly from JavaScript.
+ */
+- (void) hideSplashScreen:(NSMutableArray*) arguments withDict:(NSMutableDictionary*) options
+{
+    [[[self appDelegate] imageView] setHidden:TRUE];
+    [[[self appDelegate] window] bringSubviewToFront:[self appViewController].view];
+}
+
 @end

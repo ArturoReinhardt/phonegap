@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import <JSON/JSON.h>
+#import "JSON.h"
 
 @class PhoneGapDelegate;
 
