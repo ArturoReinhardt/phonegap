@@ -30,6 +30,11 @@ function Device() {
     }
 }
 
+/**
+ * Manually hide the splash screen when your application is ready to use.
+ */
+Device.prototype.hideSplashScreen = function() {};
+
 PhoneGap.addConstructor(function() {
     navigator.device = window.device = new Device();
 });
