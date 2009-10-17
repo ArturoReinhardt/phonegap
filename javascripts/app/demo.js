@@ -1,5 +1,13 @@
 function Demo() {
     var dis = this;
+
+    toolbar.addItem("Add", { label: "Add", type: "button" });
+    toolbar.addItem("spacer", { type: "space", flexible: true });
+    toolbar.addItem("Remove", { label: "Remove", type: "button" });
+    toolbar.setItems("Add", "spacer", "Remove");
+    toolbar.show(true);
+
+    /*
     tabbar.createTabBar();
 
     tabbar.createTabBarItem("main", "Main", null, {
@@ -48,6 +56,7 @@ function Demo() {
     } catch(e) {
         debug.error(e);
     }
+    */
 }
 
 Demo.prototype = {

@@ -14,6 +14,7 @@
 		1B2FFA550FCED89600D3003E /* TabBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B2FFA530FCED89600D3003E /* TabBar.m */; };
 		1B2FFAC90FCF673000D3003E /* Dialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B2FFAC80FCF673000D3003E /* Dialog.m */; };
 		1B2FFBB10FD1FAD400D3003E /* File.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B2FFBB00FD1FAD400D3003E /* File.m */; };
+		1B3DFA3C108519FC00E84613 /* Toolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B3DFA3B108519FC00E84613 /* Toolbar.m */; };
 		1B5C24850FB512D20033C847 /* NSString+HexColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B5C24840FB512D20033C847 /* NSString+HexColor.m */; };
 		1B64D89A0F6C73C700D12F7F /* DebugConsole.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B64D8990F6C73C700D12F7F /* DebugConsole.m */; };
 		1BB1F7D20F9E1BE2002A28DA /* Settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1BB1F7D10F9E1BE2002A28DA /* Settings.plist */; };
@@ -78,6 +79,8 @@
 		1B2FFAC80FCF673000D3003E /* Dialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Dialog.m; sourceTree = "<group>"; };
 		1B2FFBAF0FD1FAD400D3003E /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = File.h; sourceTree = "<group>"; };
 		1B2FFBB00FD1FAD400D3003E /* File.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = File.m; sourceTree = "<group>"; };
+		1B3DFA3A108519FC00E84613 /* Toolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Toolbar.h; sourceTree = "<group>"; };
+		1B3DFA3B108519FC00E84613 /* Toolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Toolbar.m; sourceTree = "<group>"; };
 		1B5C24830FB512D20033C847 /* NSString+HexColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HexColor.h"; sourceTree = "<group>"; };
 		1B5C24840FB512D20033C847 /* NSString+HexColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+HexColor.m"; sourceTree = "<group>"; };
 		1B64D8980F6C73C700D12F7F /* DebugConsole.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugConsole.h; sourceTree = "<group>"; };
@@ -251,6 +254,8 @@
 				47FAB7290EF7A663005F55AB /* Sound.m */,
 				1B2FFA520FCED89600D3003E /* TabBar.h */,
 				1B2FFA530FCED89600D3003E /* TabBar.m */,
+				1B3DFA3A108519FC00E84613 /* Toolbar.h */,
+				1B3DFA3B108519FC00E84613 /* Toolbar.m */,
 				303554BF100E56B7002C5EC0 /* Camera.h */,
 				303554C0100E56B7002C5EC0 /* Camera.m */,
 				30C531991020E3CF0017260B /* Network.h */,
@@ -467,6 +472,7 @@
 				3014D279104CA4D400CF4156 /* SBJsonBase.m in Sources */,
 				3014D27A104CA4D400CF4156 /* SBJsonParser.m in Sources */,
 				3014D27B104CA4D400CF4156 /* SBJsonWriter.m in Sources */,
+				1B3DFA3C108519FC00E84613 /* Toolbar.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
