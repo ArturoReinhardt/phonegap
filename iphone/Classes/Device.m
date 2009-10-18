@@ -42,4 +42,23 @@
     [[[self appDelegate] window] bringSubviewToFront:[self appViewController].view];
 }
 
+/**
+ Save the web view as a screenshot.  Currently only supports saving to the photo library.
+ */
+- (void)saveScreenshot:(NSArray*)arguments withDict:(NSDictionary*)options
+{
+	CGRect screenRect = [[UIScreen mainScreen] bounds];
+	UIGraphicsBeginImageContext(screenRect.size);
+	
+	CGContextRef ctx = UIGraphicsGetCurrentContext();
+	[[UIColor blackColor] set];
+	CGContextFillRect(ctx, screenRect);
+	
+	[webView.layer renderInContext:ctx];
+	
+	UIImage *image1 = UIGraphicsGetImageFromCurrentImageContext();
+	UIImageWriteToSavedPhotosAlbum(image1, nil, nil, nil);
+	UIGraphicsEndImageContext();
+}
+
 @end

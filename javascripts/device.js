@@ -35,6 +35,11 @@ function Device() {
  */
 Device.prototype.hideSplashScreen = function() {};
 
+/**
+ * Save the current state of the webview object as a screenshot.
+ */
+Device.prototype.saveScreenshot = function() {};
+
 PhoneGap.addConstructor(function() {
     navigator.device = window.device = new Device();
 });

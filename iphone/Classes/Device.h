@@ -15,5 +15,6 @@
 
 - (NSDictionary*) deviceProperties;
 - (void) hideSplashScreen:(NSMutableArray*) arguments withDict:(NSMutableDictionary*) options;
+- (void)saveScreenshot:(NSArray*)arguments withDict:(NSDictionary*)options;
 
 @end
