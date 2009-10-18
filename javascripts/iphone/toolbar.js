@@ -16,13 +16,13 @@ Toolbar.prototype._removeItem = function(id) {
 };
 
 Toolbar.prototype.setItems = function() {
-    var args = [ "Toolbar.setItems" ];
-    var c = arguments.length;
-    this.visibleItems = [];
-    for (var i = 0; i < c; i++) {
-        if (typeof(arguments[i]) == 'string')
-            this.visibleItems.push(arguments[i]);
-        args.push(arguments[i]);
-    }
+    var args = [];
+    if (arguments.length == 1 && typeof arguments[0] == 'object')
+        args = arguments[0];
+    else
+        args = arguments;
+
+    this.visibleItems = args;
+    args.unshift("Toolbar.setItems");
     PhoneGap.exec.apply(null, args);
 };
