@@ -18,7 +18,10 @@ Toolbar.prototype._removeItem = function(id) {
 Toolbar.prototype.setItems = function() {
     var args = [ "Toolbar.setItems" ];
     var c = arguments.length;
+    this.visibleItems = [];
     for (var i = 0; i < c; i++) {
+        if (typeof(arguments[i]) == 'string')
+            this.visibleItems.push(arguments[i]);
         args.push(arguments[i]);
     }
     PhoneGap.exec.apply(null, args);

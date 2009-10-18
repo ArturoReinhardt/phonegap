@@ -1,5 +1,6 @@
 function Toolbar() {
     this.items = {};
+    this.visibleItems = [];
 };
 
 Toolbar.prototype.show = function(isAnimated) {
