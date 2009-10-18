@@ -31,6 +31,9 @@
     NSDictionary *settings;
     NSMutableDictionary *commandObjects;
     NSURL *invokedURL;
+
+	UIAcceleration *lastAccel;
+	NSInteger accelCount;
 }
 
 @property (nonatomic, retain) UIWindow *window;
@@ -45,6 +48,7 @@
 - (void) javascriptAlert:(NSString*)text;
 - (BOOL) execute:(InvokedUrlCommand*)command;
 - (NSString*) appURLScheme;
+- (BOOL)getAccelerationDelta:(UIAcceleration*)accel aboveThreshold:(double)threshold;
 
 + (NSDictionary*)getBundlePlist:(NSString *)plistName;
 

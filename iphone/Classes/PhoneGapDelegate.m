@@ -73,6 +73,7 @@
 #endif
     NSNumber *useLocation          = [settings objectForKey:@"UseLocation"];
     NSNumber *useAccelerometer     = [settings objectForKey:@"EnableAcceleration"];
+    NSNumber *useAccelerometerGestures = [settings objectForKey:@"EnableAccelerationGestures"];
     NSNumber *autoRotate           = [settings objectForKey:@"AutoRotate"];
     NSString *startOrientation     = [settings objectForKey:@"StartOrientation"];
     NSString *rotateOrientation    = [settings objectForKey:@"RotateOrientation"];
@@ -87,8 +88,8 @@
 
 	webView.delegate = self;
 
-	if ([useAccelerometer boolValue]) {
-        [[UIAccelerometer sharedAccelerometer] setUpdateInterval:1.0/40.0];
+	if ([useAccelerometer boolValue] || [useAccelerometerGestures boolValue]) {
+        [[UIAccelerometer sharedAccelerometer] setUpdateInterval:1.0/5.0];
         [[UIAccelerometer sharedAccelerometer] setDelegate:self];
     }
 
@@ -404,10 +405,65 @@
  * Sends Accel Data back to the Device.
  */
 - (void) accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration {
-	NSString * jsCallBack = nil;
-	jsCallBack = [[NSString alloc] initWithFormat:@"var _accel={x:%f,y:%f,z:%f};", acceleration.x, acceleration.y, acceleration.z];
-	[webView stringByEvaluatingJavaScriptFromString:jsCallBack];
-    [jsCallBack release];
+	if ([[settings objectForKey:@"EnableAccelerationGestures"] boolValue]) {
+		if ([self getAccelerationDelta:acceleration aboveThreshold:1.0])
+			accelCount += 10;
+		else if ([self getAccelerationDelta:acceleration aboveThreshold:0.8])
+			accelCount += 8;
+		else if ([self getAccelerationDelta:acceleration aboveThreshold:0.5])
+			accelCount += 5;
+		else if ([self getAccelerationDelta:acceleration aboveThreshold:0.2])
+			accelCount++;
+		else if (accelCount > 0)
+			accelCount--;
+		
+		if (lastAccel != nil)
+			[lastAccel release];
+		lastAccel = acceleration;
+		[lastAccel retain];
+		
+		if (accelCount > 10) {
+			[webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:
+															 @"(function(){ "
+															 "var e = document.createEvent('Events'); "
+															 "e.initEvent('accelerometerShake', 'false', 'false'); "
+															 "e.strength = %d; "
+															 "document.dispatchEvent(e); "
+															 "})()",
+															 accelCount]];
+			accelCount = 0;
+		}
+	}
+	
+	if ([[settings objectForKey:@"EnableAcceleration"] boolValue]) {
+		NSString *js = [[NSString alloc] initWithFormat:@"var _accel = { x: %f, y: %f, z: %f };\n"
+						"(function(){ "
+						"var e = document.createEvent('Events'); "
+						"e.initEvent('accelerometerUpdated', 'false', 'false'); "
+						"e.x = _accel.x; "
+						"e.y = _accel.y; "
+						"e.z = _accel.z; "
+						"document.dispatchEvent(e); "
+						"})()",
+						acceleration.x, acceleration.y, acceleration.z];
+		//NSLog(@"accel: %@", js);
+		[webView stringByEvaluatingJavaScriptFromString:js];
+		[js release];
+	}
+}
+
+- (BOOL)getAccelerationDelta:(UIAcceleration *)accel aboveThreshold:(double)threshold
+{
+	if (lastAccel == nil)
+		return NO;
+	
+	double deltaX = (double)lastAccel.x - (double)accel.x;
+	double deltaY = (double)lastAccel.y - (double)accel.y;
+	double deltaZ = (double)lastAccel.z - (double)accel.z;
+	
+	return (deltaX > threshold && deltaY > threshold) ||
+	(deltaX > threshold && deltaZ > threshold) ||
+	(deltaY > threshold && deltaZ > threshold);
 }
 
 - (void)dealloc

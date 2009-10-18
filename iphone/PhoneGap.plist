@@ -9,6 +9,8 @@
 	<key>EnableLocation</key>
 	<true/>
 	<key>EnableAcceleration</key>
+	<false/>
+	<key>EnableAccelerationGestures</key>
 	<true/>
 	<key>AutoRotate</key>
 	<true/>
