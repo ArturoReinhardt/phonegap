@@ -6,7 +6,7 @@ function Demo() {
     //toolbar.addItem("Thingie", { label: "file:///www/some-icon.png", type: "button", onClick: function() { debug.log("Thingie") } });
     toolbar.addItem("spacer", { type: "space", flexible: true });
     toolbar.addItem("Remove", { label: "Remove", type: "button", onClick: function() { debug.log("Remove") } });
-    toolbar.setItems("Add", "Thingie", "spacer", "Remove");
+    toolbar.setItems(["Add", "Thingie", "spacer", "Remove"], { animated: true });
     toolbar.show(true);
     */
 
