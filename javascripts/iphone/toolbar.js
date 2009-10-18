@@ -1,11 +1,7 @@
 Toolbar.prototype._show = function(isAnimated) {
-    if (typeof isAnimated != 'bool')
-        isAnimated = false;
     PhoneGap.exec("Toolbar.show", { animated: isAnimated });
 };
 Toolbar.prototype._hide = function(isAnimated) {
-    if (typeof isAnimated != 'bool')
-        isAnimated = false;
     PhoneGap.exec("Toolbar.hide", { animated: isAnimated });
 };
 
