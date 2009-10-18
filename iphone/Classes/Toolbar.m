@@ -88,6 +88,19 @@
 		} else {
 			style = UIBarButtonItemStyleBordered;
 		}
+		label = (NSString*)[options objectForKey:@"label"];
+
+		UIBarButtonSystemItem labelItem = [PhoneGapCommand getBarButtonSystemItemFor:label];
+		if (labelItem != -1) {
+			view = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:labelItem
+																 target:target
+																 action:@selector(itemClicked:)];
+		} else {
+			view = [[UIBarButtonItem alloc] initWithTitle:label
+													style:style
+												   target:target
+												   action:@selector(itemClicked:)];
+		}
 		view.style = style;
     }
     return self;

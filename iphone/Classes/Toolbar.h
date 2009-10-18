@@ -46,8 +46,9 @@ typedef enum {
 -(PGToolbarLabel*) initWithOptions:(NSDictionary*)inOptions target:(id)target;
 @end
 
-@interface PGToolbarButton : PGToolbarLabel {
+@interface PGToolbarButton : PGToolbarItem {
 	BOOL enabled;
+	NSString *label;
 	UIBarButtonItemStyle style;
 }
 -(PGToolbarButton*) initWithOptions:(NSDictionary*)inOptions target:(id)target;

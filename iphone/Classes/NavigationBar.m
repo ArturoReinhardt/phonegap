@@ -94,7 +94,7 @@
     if ([arguments count] > 1) {
         NSString* rightTitle = [arguments objectAtIndex:1];
         if ([rightTitle length] > 0) {
-            UIBarButtonSystemItem systemItem = [self getBarButtonSystemItemFor:rightTitle];
+            UIBarButtonSystemItem systemItem = [PhoneGapCommand getBarButtonSystemItemFor:rightTitle];
             NSURL *filePath = [self getLocalFileFor:rightTitle];
             UIBarButtonItemStyle itemStyle = [self getBarButtonStyleFor:[options objectForKey:@"rightStyle"]];
             UIBarButtonItem* rightButton;

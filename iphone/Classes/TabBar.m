@@ -126,7 +126,7 @@
     int tag              = [[arguments objectAtIndex:3] intValue];
 
     UITabBarItem *item = nil;    
-    UIBarButtonSystemItem systemItem = [self getBarButtonSystemItemFor:imageName];
+    UIBarButtonSystemItem systemItem = [PhoneGapCommand getBarButtonSystemItemFor:imageName];
     if (systemItem != -1) {
         item = [[UITabBarItem alloc] initWithTabBarSystemItem:systemItem tag:tag];
     } else {

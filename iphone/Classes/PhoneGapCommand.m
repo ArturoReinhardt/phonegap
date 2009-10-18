@@ -139,7 +139,7 @@ static PhoneGapCommand *sharedSingletonInstance = nil;
  Utility function used to translate a string into an internal constant representing a system item icon type.
  These are typically used by tab bars or navigation bars to render a native icon type, such as "Search", "History", etc.
  */
-- (UIBarButtonSystemItem) getBarButtonSystemItemFor:(NSString*)imageName
++ (UIBarButtonSystemItem) getBarButtonSystemItemFor:(NSString*)imageName
 {
     if ([imageName isEqualToString:@"tabButton:More"])           return UITabBarSystemItemMore;
     if ([imageName isEqualToString:@"tabButton:Favorites"])      return UITabBarSystemItemFavorites;

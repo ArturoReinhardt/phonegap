@@ -19,6 +19,8 @@
 @property (nonatomic, retain) UIWebView *webView;
 @property (nonatomic, retain) NSDictionary *settings;
 
++ (UIBarButtonSystemItem)getBarButtonSystemItemFor:(NSString*)imageName;
+
 -(PhoneGapCommand*) initWithWebView:(UIWebView*)theWebView settings:(NSDictionary*)classSettings;
 -(PhoneGapCommand*) initWithWebView:(UIWebView*)theWebView;
 
@@ -26,7 +28,6 @@
 
 - (void)setFrameFor:(UIView*)control withSettings:(NSDictionary*)controlSettings;
 - (NSURL*)getLocalFileFor:(NSString*)filename;
-- (UIBarButtonSystemItem)getBarButtonSystemItemFor:(NSString*)imageName;
 
 -(PhoneGapDelegate*) appDelegate;
 -(UIViewController*) appViewController;
