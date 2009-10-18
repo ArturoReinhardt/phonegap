@@ -1,9 +1,15 @@
 function Toolbar() {
     this.items = {};
-}
+};
 
-Toolbar.prototype.show = function(isAnimated) {};
-Toolbar.prototype.hide = function(isAnimated) {};
+Toolbar.prototype.show = function(isAnimated) {
+    this.open = true;
+    this._show(isAnimated);
+};
+Toolbar.prototype.hide = function(isAnimated) {
+    this.open = false;
+    this._hide(isAnimated);
+};
 
 Toolbar.prototype.addItem = function(id, options) {
     try {
@@ -43,6 +49,8 @@ Toolbar.prototype.removeItem = function(id) {
 };
 Toolbar.prototype.setItems = function() {};
 
+Toolbar.prototype._show = function(isAnimated) {};
+Toolbar.prototype._hide = function(isAnimated) {};
 Toolbar.prototype._addItem = function(id) {};
 Toolbar.prototype._updateItem = function(id) {};
 Toolbar.prototype._removeItem = function(id) {};
