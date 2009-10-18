@@ -1,13 +1,15 @@
 function Demo() {
     var dis = this;
 
+    /*
     toolbar.addItem("Add", { label: "toolButton:Add", type: "button", onClick: function() { debug.log("Add") } });
+    //toolbar.addItem("Thingie", { label: "file:///www/some-icon.png", type: "button", onClick: function() { debug.log("Thingie") } });
     toolbar.addItem("spacer", { type: "space", flexible: true });
     toolbar.addItem("Remove", { label: "Remove", type: "button", onClick: function() { debug.log("Remove") } });
-    toolbar.setItems("Add", "spacer", "Remove");
+    toolbar.setItems("Add", "Thingie", "spacer", "Remove");
     toolbar.show(true);
+    */
 
-    return;
     tabbar.createTabBar();
 
     tabbar.createTabBarItem("main", "Main", null, {

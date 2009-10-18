@@ -91,16 +91,29 @@
 		}
 		label = (NSString*)[options objectForKey:@"label"];
 
+		SEL action = @selector(itemClicked:);
 		UIBarButtonSystemItem labelItem = [PhoneGapCommand getBarButtonSystemItemFor:label];
 		if (labelItem != -1) {
 			view = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:labelItem
 																 target:target
-																 action:@selector(itemClicked:)];
-		} else {
+																 action:action];
+		}
+		
+		else if ([[NSURL URLWithString:label] isFileURL]) {
+			NSURL *url = [NSURL URLWithString:label];
+			NSString *filePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:[url path]];
+			UIImage *image = [UIImage imageWithContentsOfFile:filePath];
+			view = [[UIBarButtonItem alloc] initWithImage:image
+													style:style
+												   target:target
+												   action:action];
+		}
+		
+		else {
 			view = [[UIBarButtonItem alloc] initWithTitle:label
 													style:style
 												   target:target
-												   action:@selector(itemClicked:)];
+												   action:action];
 		}
 		view.style = style;
     }
