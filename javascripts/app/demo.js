@@ -1,14 +1,13 @@
 function Demo() {
     var dis = this;
 
-    /*
-    toolbar.addItem("Add", { label: "toolButton:Add", type: "button" });
+    toolbar.addItem("Add", { label: "toolButton:Add", type: "button", onClick: function() { debug.log("Add") } });
     toolbar.addItem("spacer", { type: "space", flexible: true });
-    toolbar.addItem("Remove", { label: "Remove", type: "button" });
+    toolbar.addItem("Remove", { label: "Remove", type: "button", onClick: function() { debug.log("Remove") } });
     toolbar.setItems("Add", "spacer", "Remove");
     toolbar.show(true);
-    */
 
+    return;
     tabbar.createTabBar();
 
     tabbar.createTabBarItem("main", "Main", null, {
@@ -180,6 +179,6 @@ function preventBehavior(e) {
 };
 
 PhoneGap.addConstructor(function(){
-  document.addEventListener("touchmove", preventBehavior, false);
+  //document.addEventListener("touchmove", preventBehavior, false);
   window.app = new Demo();
 });

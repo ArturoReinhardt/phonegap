@@ -30,7 +30,6 @@
     UIInterfaceOrientation orientationType;
     NSDictionary *settings;
     NSMutableDictionary *commandObjects;
-    NSString *jsAppName;
     NSURL *invokedURL;
 }
 
@@ -39,7 +38,6 @@
 @property (nonatomic, retain) UIActivityIndicatorView *activityView;
 @property (nonatomic, retain) NSMutableDictionary *commandObjects;
 @property (nonatomic, retain) NSDictionary *settings;
-@property (nonatomic, retain) NSString *jsAppName;
 @property (nonatomic, retain) NSURL *invokedURL;
 
 - (id) getCommandInstance:(NSString*)className;

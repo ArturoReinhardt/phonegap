@@ -43,9 +43,9 @@
 		<key>animation</key>
 		<string>slide</string>
 		<key>opaque</key>
-		<false/>
+		<true/>
 		<key>tintColor</key>
-		<string>#0000ff</string>
+		<string>#03030f</string>
 	</dict>
 </dict>
 </plist>

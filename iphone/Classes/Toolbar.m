@@ -7,6 +7,7 @@
 //
 
 #import "Toolbar.h"
+#import "NSString+HexColor.h"
 
 @implementation PGToolbarItem
 @synthesize view;
@@ -115,7 +116,6 @@
     self = (Toolbar*)[super initWithWebView:theWebView];
     if (self) {
         mItems = [[NSMutableDictionary alloc] initWithCapacity:5];
-		[self createToolbar];
     }
     return self;
 }
@@ -125,10 +125,8 @@
 
 - (void)createToolbar
 {
-    if (mToolbar) {
-        NSLog(@"Toolbar already exists; not creating another.");
+    if (mToolbar != nil)
         return;
-    }
 
     mToolbar = [UIToolbar new];
     [mToolbar sizeToFit];
@@ -137,9 +135,20 @@
     mToolbar.hidden                 = YES;
     mToolbar.userInteractionEnabled = YES;
 
-    [self setFrameFor:mToolbar withSettings:settings];
-	[self.webView.superview addSubview:mToolbar];
+	if ([settings objectForKey:@"opaque"] && ![[settings objectForKey:@"opaque"] boolValue]) {
+		mToolbar.opaque = NO;
+		mToolbar.barStyle = UIBarStyleBlack;
+		mToolbar.translucent = YES;
+		mToolbar.alpha = 0.8;
+	}
+	if ([settings objectForKey:@"tintColor"]) {
+		UIColor *tint = [[settings objectForKey:@"tintColor"] colorFromHex];
+		mToolbar.tintColor = tint;
+	}
 	
+	[self setFrameFor:mToolbar withSettings:settings];
+	[self.webView.superview addSubview:mToolbar];
+
 	mPosition = PGToolbarPositionBottom;
 	if ([[settings objectForKey:@"position"] isEqualToString:@"bottom"])
 		mPosition = PGToolbarPositionBottom;
@@ -179,6 +188,8 @@
 
 - (void)show:(NSArray*)arguments withDict:(NSDictionary*)options
 {
+	[self createToolbar];
+
 	BOOL animation = YES;
 	if ([options objectForKey:@"animated"])
 		animation = [[options objectForKey:@"animated"] boolValue];
@@ -188,6 +199,8 @@
 
 - (void)hide:(NSArray*)arguments withDict:(NSDictionary*)options
 {
+	[self createToolbar];
+
 	BOOL animation = YES;
 	if ([options objectForKey:@"animated"])
 		animation = [[options objectForKey:@"animated"] boolValue];
@@ -197,6 +210,8 @@
 
 - (void)addItem:(NSArray*)arguments withDict:(NSDictionary*)options
 {
+	[self createToolbar];
+
 	if ([arguments count] == 0) {
 		NSLog(@"Toolbar.addItem requires an id to be supplied");
 		return;
@@ -226,14 +241,18 @@
 
 - (void)updateItem:(NSArray*)arguments withDict:(NSDictionary*)options
 {
+	[self createToolbar];
 }
 
 - (void)removeItem:(NSArray*)arguments withDict:(NSDictionary*)options
 {
+	[self createToolbar];
 }
 
 - (void)setItems:(NSArray*)arguments withDict:(NSDictionary*)options
 {
+	[self createToolbar];
+
 	BOOL isAnimated = [[options objectForKey:@"animated"] boolValue];
 
 	int i, c = [arguments count];
@@ -265,9 +284,9 @@
 
 - (void)dealloc
 {
-    if (mToolbar)
+    if (mToolbar != nil)
         [mToolbar release];
-	if (mItems)
+	if (mItems != nil)
 		[mItems release];
     [super dealloc];
 }

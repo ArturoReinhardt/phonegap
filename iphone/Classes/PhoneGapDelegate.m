@@ -11,7 +11,6 @@
 @synthesize activityView;
 @synthesize commandObjects;
 @synthesize settings;
-@synthesize jsAppName;
 @synthesize invokedURL;
 
 - (id) init
@@ -60,12 +59,6 @@
  */
 - (void)applicationDidFinishLaunching:(UIApplication *)application
 {	
-    /* Load what our app name is called from the Info.plist bundle.  This is used as the main
-     * class name under which our app is running, since the build-phonegap.sh script renames
-     * the main classes to our application's name at build time.
-     */
-    jsAppName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
-
 	/*
 	 * PhoneGap.plist
 	 *
@@ -341,7 +334,7 @@
 		InvokedUrlCommand* iuc = [[InvokedUrlCommand newFromUrl:url] autorelease];
         
 		// Tell the JS code that we've gotten this command, and we're ready for another
-        [theWebView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@.queue.ready = true;", self.jsAppName]];
+        [theWebView stringByEvaluatingJavaScriptFromString:@"PhoneGap.queue.ready = true;"];
 		
 		// Check to see if we are provided a class:method style command.
 		[self execute:iuc];

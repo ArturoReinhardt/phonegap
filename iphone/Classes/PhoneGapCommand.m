@@ -131,8 +131,11 @@ static PhoneGapCommand *sharedSingletonInstance = nil;
                                    webViewBounds.size.height - height
                                    );
     }
+	
     [control setFrame:controlBounds];
-    [webView setFrame:webViewBounds];
+	
+	if ([settings objectForKey:@"opaque"] && [[settings objectForKey:@"opaque"] boolValue])
+		[webView setFrame:webViewBounds];
 }
 
 /**
